@@ -97,7 +97,7 @@ const i18n = {
   },
 };
 
-let lang = localStorage.getItem('cg_lang') || 'en';
+let lang = 'en';
 let darkMode = false;
 
 function applyTheme(dark) {
@@ -153,8 +153,12 @@ function applyLang() {
 
 function setLang(targetLang) {
   lang = targetLang;
-  localStorage.setItem('cg_lang', lang);
   applyLang();
+  fetch('/api/config', {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify({ language: targetLang }),
+  }).catch(() => {});
   // 캐시된 권한 데이터로 재렌더링 (fetch 없이)
   if (cachedPermData !== null) {
     renderPermissions(cachedPermData);
@@ -170,6 +174,8 @@ async function loadConfig() {
     document.getElementById('hotkeyScroll').value = cfg.hotkey_scroll || '';
     document.getElementById('captureCount').textContent = cfg.capture_count ?? '-';
     applyTheme(!!cfg.dark_mode);
+    lang = cfg.language || 'en';
+    applyLang();
     const licEl = document.getElementById('licenseStatus');
     licEl.dataset.activated = cfg.license_activated ? '1' : '0';
     licEl.textContent = cfg.license_activated
@@ -281,9 +287,9 @@ async function loadPermissions() {
     cachedPermData = data;
     renderPermissions(data);
 
-    // 첫 실행 모달: 권한 미부여 + cg_welcomed 미설정 시 표시
+    // 권한 미부여 시 안내 모달 표시
     const anyDenied = !data.screen_recording || !data.accessibility;
-    if (anyDenied && !localStorage.getItem('cg_welcomed')) {
+    if (anyDenied) {
       document.getElementById('permModal').classList.remove('hidden');
     }
   } catch (e) {
@@ -292,7 +298,6 @@ async function loadPermissions() {
 }
 
 function closePermModal() {
-  localStorage.setItem('cg_welcomed', '1');
   document.getElementById('permModal').classList.add('hidden');
 }
 
