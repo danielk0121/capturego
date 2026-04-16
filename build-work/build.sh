@@ -54,9 +54,11 @@ echo "[4/5] 빌드 결과 확인..."
 ls -lh "$BUNDLE/Contents/MacOS/$BINARY_NAME"
 file "$BUNDLE/Contents/MacOS/$BINARY_NAME"
 
+# 앱 번들 내 buildtime.txt 복사
+cp "$APP_SRC/server/static/buildtime.txt" "$BUNDLE/Contents/buildtime.txt"
+
 # DMG 생성
-VERSION="${VERSION:-1.0.0}"
-DMG_NAME="${APP_NAME}-${VERSION}.dmg"
+DMG_NAME="${APP_NAME}-${BUILDTIME}.dmg"
 DMG_PATH="$OUT_DIR/$DMG_NAME"
 
 echo ""
