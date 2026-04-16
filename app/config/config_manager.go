@@ -30,6 +30,8 @@ type Config struct {
 	LicenseKey string `json:"license_key"`
 	// 다크모드 여부 (false: 라이트모드, true: 다크모드)
 	DarkMode bool `json:"dark_mode"`
+	// UI 언어 ("ko" 또는 "en")
+	Language string `json:"language"`
 }
 
 var (

@@ -178,6 +178,7 @@ func getConfig(c *gin.Context) {
 		"license_activated": cfg.LicenseActivated,
 		"nagware_disabled":  cfg.NagwareDisabled,
 		"dark_mode":         cfg.DarkMode,
+		"language":          cfg.Language,
 	})
 }
 
@@ -188,6 +189,7 @@ func (ws *WebServer) postConfig(c *gin.Context) {
 		HotkeyCapture string `json:"hotkey_capture"`
 		HotkeyScroll  string `json:"hotkey_scroll"`
 		LicenseKey    string `json:"license_key"`
+		Language      string `json:"language"`
 	}
 	if err := c.ShouldBindJSON(&body); err != nil {
 		c.JSON(http.StatusBadRequest, gin.H{"error": "잘못된 요청 형식입니다"})
@@ -199,6 +201,9 @@ func (ws *WebServer) postConfig(c *gin.Context) {
 
 	if body.SaveDirectory != "" {
 		cfg.SaveDirectory = body.SaveDirectory
+	}
+	if body.Language != "" {
+		cfg.Language = body.Language
 	}
 	if body.HotkeyCapture != "" && body.HotkeyCapture != cfg.HotkeyCapture {
 		cfg.HotkeyCapture = body.HotkeyCapture
