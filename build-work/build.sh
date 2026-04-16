@@ -14,7 +14,7 @@ BUNDLE="$OUT_DIR/$APP_NAME.app"
 echo "=== CaptureGo 빌드 시작 ==="
 
 # 아이콘 생성 (SVG → icns, tray_icon, favicon)
-echo "[0/3] 아이콘 생성..."
+echo "[0/5] 아이콘 생성..."
 GEN_ICON_DIR="$SCRIPT_DIR/gen_icon"
 if [ ! -d "$GEN_ICON_DIR/node_modules" ]; then
   echo "       npm install 실행 중..."
@@ -22,18 +22,24 @@ if [ ! -d "$GEN_ICON_DIR/node_modules" ]; then
 fi
 node "$GEN_ICON_DIR/gen_icon.js"
 
+# buildtime.txt 생성 (KST 기준 v-yyyyMMdd-HHmm-kst 형식)
+echo "[1/5] buildtime.txt 생성..."
+BUILDTIME="v-$(TZ=Asia/Seoul date '+%Y%m%d-%H%M')-kst"
+echo "$BUILDTIME" > "$APP_SRC/server/static/buildtime.txt"
+echo "       buildtime: $BUILDTIME"
+
 # 출력 디렉토리 초기화
 rm -rf "$OUT_DIR"
 mkdir -p "$BUNDLE/Contents/MacOS"
 mkdir -p "$BUNDLE/Contents/Resources"
 
 # Go 바이너리 빌드 (Apple Silicon)
-echo "[1/3] Go 바이너리 빌드 (arm64)..."
+echo "[2/5] Go 바이너리 빌드 (arm64)..."
 cd "$APP_SRC"
 CGO_ENABLED=1 GOOS=darwin GOARCH=arm64 \
   go build -ldflags="-s -w" -o "$BUNDLE/Contents/MacOS/$BINARY_NAME" .
 
-echo "[2/3] Info.plist 복사..."
+echo "[3/5] Info.plist 복사..."
 cp "$SCRIPT_DIR/Info.plist" "$BUNDLE/Contents/Info.plist"
 
 # 앱 아이콘 복사 (있는 경우)
@@ -44,7 +50,7 @@ else
   echo "       [주의] AppIcon.icns 없음 — 기본 아이콘 사용"
 fi
 
-echo "[3/3] 빌드 결과 확인..."
+echo "[4/5] 빌드 결과 확인..."
 ls -lh "$BUNDLE/Contents/MacOS/$BINARY_NAME"
 file "$BUNDLE/Contents/MacOS/$BINARY_NAME"
 
@@ -54,7 +60,7 @@ DMG_NAME="${APP_NAME}-${VERSION}.dmg"
 DMG_PATH="$OUT_DIR/$DMG_NAME"
 
 echo ""
-echo "[4/4] DMG 생성..."
+echo "[5/5] DMG 생성..."
 
 # 임시 마운트 폴더 구성
 DMG_STAGING="$OUT_DIR/dmg_staging"
