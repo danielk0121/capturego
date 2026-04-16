@@ -21,6 +21,11 @@
     </div>
 
     <div class="card">
+      <h2 data-i18n="section_permissions"></h2>
+      <div id="permList"><span class="perm-loading" data-i18n="perm_loading"></span></div>
+    </div>
+
+    <div class="card">
       <h2 data-i18n="section_save_path"></h2>
       <div class="form-group">
         <label for="saveDir" data-i18n="label_save_dir"></label>
@@ -58,6 +63,29 @@
       <div>CaptureGo &mdash; <span data-i18n="footer_dev"></span> <a href="mailto:maedk10@gmail.com">maedk10@gmail.com</a></div>
       <div><a href="/license" data-i18n="footer_oss_link"></a></div>
     </footer>
+  </div>
+
+  <!-- 권한 안내 모달 -->
+  <div class="modal-overlay hidden" id="permModal">
+    <div class="modal-box">
+      <h2 data-i18n="modal_title"></h2>
+      <p class="modal-sub" data-i18n="modal_sub"></p>
+      <ol class="modal-steps">
+        <li>
+          <span class="step-num">1</span>
+          <span class="step-text" data-i18n="modal_step1"></span>
+        </li>
+        <li>
+          <span class="step-num">2</span>
+          <span class="step-text" data-i18n="modal_step2"></span>
+        </li>
+        <li>
+          <span class="step-num">3</span>
+          <span class="step-text" data-i18n="modal_step3"></span>
+        </li>
+      </ol>
+      <button class="modal-close-btn" onclick="closePermModal()" data-i18n="modal_btn_close"></button>
+    </div>
   </div>
 
   <script src="/static/app.js"></script>

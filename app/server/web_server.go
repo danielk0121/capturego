@@ -72,6 +72,7 @@ func (ws *WebServer) registerRoutes() {
 	ws.engine.GET("/license", serveLicense)
 	ws.engine.GET("/api/config", getConfig)
 	ws.engine.POST("/api/config", postConfig)
+	ws.engine.GET("/api/permissions", getPermissions)
 
 	// 정적 파일 서빙 (favicon 등)
 	sub, err := fs.Sub(staticFiles, "static")
@@ -109,6 +110,12 @@ func serveLicense(c *gin.Context) {
 		return
 	}
 	c.Data(http.StatusOK, "text/html; charset=utf-8", data)
+}
+
+// getPermissions macOS 권한 상태를 JSON으로 반환한다
+func getPermissions(c *gin.Context) {
+	status := core.QueryPermissions()
+	c.JSON(http.StatusOK, status)
 }
 
 // getConfig 현재 설정값을 JSON으로 반환한다

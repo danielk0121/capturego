@@ -6,6 +6,44 @@ import (
 	"os/exec"
 )
 
+// PermissionStatus 권한 상태를 담는 구조체
+type PermissionStatus struct {
+	ScreenRecording bool `json:"screen_recording"`
+	Accessibility   bool `json:"accessibility"`
+}
+
+// QueryPermissions 현재 macOS 권한 상태를 조회한다
+func QueryPermissions() PermissionStatus {
+	return PermissionStatus{
+		ScreenRecording: queryScreenRecording(),
+		Accessibility:   queryAccessibility(),
+	}
+}
+
+// queryScreenRecording 화면 기록 권한 상태를 반환한다
+func queryScreenRecording() bool {
+	tmpFile := os.TempDir() + "/capturego_perm_query.png"
+	defer os.Remove(tmpFile)
+
+	if err := exec.Command("screencapture", "-x", "-m", tmpFile).Run(); err != nil {
+		return false
+	}
+	_, err := os.Stat(tmpFile)
+	return err == nil
+}
+
+// queryAccessibility 손쉬운 사용 권한 상태를 반환한다 (osascript로 간접 확인)
+func queryAccessibility() bool {
+	// AXIsProcessTrusted를 osascript로 간접 조회
+	script := `tell application "System Events" to return UI elements enabled`
+	out, err := exec.Command("osascript", "-e", script).Output()
+	if err != nil {
+		return false
+	}
+	result := string(out)
+	return len(result) > 0 && result[0] == 't' // "true\n"
+}
+
 // CheckPermissions 필요한 macOS 권한을 확인하고, 미부여 시 안내 알림을 표시한다
 func CheckPermissions() {
 	checkScreenRecording()

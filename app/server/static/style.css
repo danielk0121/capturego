@@ -162,3 +162,96 @@ footer {
 }
 footer a { color: var(--subtext); text-decoration: none; }
 footer a:hover { color: var(--accent); }
+
+/* 권한 상태 배지 */
+.perm-row {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  font-size: 14px;
+  padding: 10px 0;
+  border-bottom: 1px solid var(--divider);
+}
+.perm-row:last-child { border-bottom: none; }
+.perm-row-left { display: flex; flex-direction: column; gap: 2px; }
+.perm-row-desc { font-size: 12px; color: var(--subtext); }
+.perm-row-right { display: flex; align-items: center; gap: 8px; }
+.perm-badge {
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  font-size: 12px;
+  font-weight: 600;
+  padding: 3px 10px;
+  border-radius: 20px;
+}
+.perm-badge.granted { background: rgba(52,199,89,0.15); color: #34c759; }
+.perm-badge.denied  { background: rgba(255,59,48,0.15); color: #ff3b30; }
+.perm-open-btn {
+  font-size: 12px;
+  color: var(--accent);
+  background: none;
+  border: none;
+  cursor: pointer;
+  padding: 0;
+  text-decoration: underline;
+}
+.perm-open-btn:hover { color: var(--accent-hover); }
+.perm-loading { font-size: 13px; color: var(--subtext); }
+
+/* 첫 실행 권한 안내 모달 */
+.modal-overlay {
+  position: fixed;
+  inset: 0;
+  background: rgba(0,0,0,0.55);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 1000;
+}
+.modal-overlay.hidden { display: none; }
+.modal-box {
+  background: var(--surface);
+  border-radius: 16px;
+  padding: 32px;
+  max-width: 480px;
+  width: 90%;
+  box-shadow: 0 8px 32px rgba(0,0,0,0.3);
+}
+.modal-box h2 { font-size: 18px; font-weight: 700; margin-bottom: 8px; }
+.modal-box .modal-sub { font-size: 14px; color: var(--subtext); margin-bottom: 24px; }
+.modal-steps { list-style: none; display: flex; flex-direction: column; gap: 14px; margin-bottom: 28px; }
+.modal-steps li {
+  display: flex;
+  gap: 12px;
+  align-items: flex-start;
+  font-size: 14px;
+}
+.modal-steps .step-num {
+  flex-shrink: 0;
+  width: 24px;
+  height: 24px;
+  border-radius: 50%;
+  background: var(--accent);
+  color: white;
+  font-size: 12px;
+  font-weight: 700;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+.modal-steps .step-text { line-height: 1.5; padding-top: 2px; }
+.modal-steps .step-text a { color: var(--accent); text-decoration: none; }
+.modal-steps .step-text a:hover { text-decoration: underline; }
+.modal-close-btn {
+  width: 100%;
+  padding: 12px;
+  background: var(--accent);
+  color: white;
+  border: none;
+  border-radius: 8px;
+  font-size: 15px;
+  font-weight: 500;
+  cursor: pointer;
+}
+.modal-close-btn:hover { background: var(--accent-hover); }

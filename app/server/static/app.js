@@ -4,6 +4,15 @@ const i18n = {
     section_status: '현황',
     label_capture_count: '누적 캡처 횟수',
     label_license: '라이선스',
+    section_permissions: 'macOS 권한',
+    perm_loading: '권한 확인 중...',
+    perm_screen_recording: '화면 기록',
+    perm_screen_recording_desc: '스크린샷 캡처에 필요합니다',
+    perm_accessibility: '손쉬운 사용',
+    perm_accessibility_desc: '글로벌 단축키 감지에 필요합니다',
+    perm_granted: '허용됨 ✓',
+    perm_denied: '미허용 ✗',
+    perm_open_settings: '설정 열기',
     section_save_path: '저장 경로',
     label_save_dir: '캡처 파일 저장 폴더',
     placeholder_save_dir: '예: /Users/user/Pictures/CaptureGo',
@@ -26,12 +35,27 @@ const i18n = {
     msg_save_error: '저장 중 오류가 발생했습니다.',
     footer_dev: '개발자:',
     footer_oss_link: '오픈소스 라이선스',
+    modal_title: '권한 설정이 필요합니다',
+    modal_sub: 'CaptureGo가 정상 작동하려면 아래 두 가지 권한이 필요합니다.',
+    modal_step1: '<b>화면 기록 권한</b>: 시스템 설정 → 개인 정보 보호 및 보안 → <a href="x-apple.systempreferences:com.apple.preference.security?Privacy_ScreenCapture" onclick="openPref(this)">화면 기록</a> → CaptureGo 허용',
+    modal_step2: '<b>손쉬운 사용 권한</b>: 시스템 설정 → 개인 정보 보호 및 보안 → <a href="x-apple.systempreferences:com.apple.preference.security?Privacy_Accessibility" onclick="openPref(this)">손쉬운 사용</a> → CaptureGo 허용',
+    modal_step3: '권한 부여 후 <b>앱을 재시작</b>하면 모든 기능이 활성화됩니다.',
+    modal_btn_close: '확인했습니다',
   },
   en: {
     title_suffix: 'Settings',
     section_status: 'Status',
     label_capture_count: 'Total Captures',
     label_license: 'License',
+    section_permissions: 'macOS Permissions',
+    perm_loading: 'Checking permissions...',
+    perm_screen_recording: 'Screen Recording',
+    perm_screen_recording_desc: 'Required for screenshot capture',
+    perm_accessibility: 'Accessibility',
+    perm_accessibility_desc: 'Required for global hotkey detection',
+    perm_granted: 'Granted ✓',
+    perm_denied: 'Not Granted ✗',
+    perm_open_settings: 'Open Settings',
     section_save_path: 'Save Path',
     label_save_dir: 'Capture Save Folder',
     placeholder_save_dir: 'e.g. /Users/user/Pictures/CaptureGo',
@@ -54,6 +78,12 @@ const i18n = {
     msg_save_error: 'An error occurred while saving.',
     footer_dev: 'Developer:',
     footer_oss_link: 'Open Source Licenses',
+    modal_title: 'Permissions Required',
+    modal_sub: 'CaptureGo needs the following two permissions to work properly.',
+    modal_step1: '<b>Screen Recording</b>: System Settings → Privacy & Security → <a href="x-apple.systempreferences:com.apple.preference.security?Privacy_ScreenCapture" onclick="openPref(this)">Screen Recording</a> → Allow CaptureGo',
+    modal_step2: '<b>Accessibility</b>: System Settings → Privacy & Security → <a href="x-apple.systempreferences:com.apple.preference.security?Privacy_Accessibility" onclick="openPref(this)">Accessibility</a> → Allow CaptureGo',
+    modal_step3: 'After granting permissions, <b>restart the app</b> to activate all features.',
+    modal_btn_close: 'Got it',
   },
 };
 
@@ -63,7 +93,14 @@ function applyLang() {
   const t = i18n[lang];
   document.querySelectorAll('[data-i18n]').forEach(el => {
     const key = el.getAttribute('data-i18n');
-    if (t[key] !== undefined) el.textContent = t[key];
+    if (t[key] !== undefined) {
+      // modal step 등 HTML 마크업 포함 문자열은 innerHTML로 처리
+      if (key.startsWith('modal_step')) {
+        el.innerHTML = t[key];
+      } else {
+        el.textContent = t[key];
+      }
+    }
   });
   document.querySelectorAll('[data-i18n-placeholder]').forEach(el => {
     const key = el.getAttribute('data-i18n-placeholder');
@@ -83,6 +120,8 @@ function toggleLang() {
   } else if (licEl.dataset.activated === '0') {
     licEl.textContent = i18n[lang].license_inactive;
   }
+  // 권한 패널 재렌더링
+  loadPermissions();
 }
 
 async function loadConfig() {
@@ -134,5 +173,67 @@ function showStatus(msg, ok) {
   setTimeout(() => { el.textContent = ''; el.className = ''; }, 3000);
 }
 
+// 권한 설정 열기 (앱 내 URL scheme 사용)
+function openPref(el) {
+  // <a> 클릭 시 기본 동작(브라우저 이동)을 막고 /api/open-url로 위임
+  // 단순히 링크를 열도록 처리 — 브라우저가 직접 URL scheme을 처리한다
+}
+
+async function loadPermissions() {
+  const t = i18n[lang];
+  const container = document.getElementById('permList');
+  try {
+    const res = await fetch('/api/permissions');
+    const data = await res.json();
+
+    const SCREEN_URL = 'x-apple.systempreferences:com.apple.preference.security?Privacy_ScreenCapture';
+    const ACCESS_URL = 'x-apple.systempreferences:com.apple.preference.security?Privacy_Accessibility';
+
+    const rows = [
+      {
+        label: t.perm_screen_recording,
+        desc: t.perm_screen_recording_desc,
+        granted: data.screen_recording,
+        settingsUrl: SCREEN_URL,
+      },
+      {
+        label: t.perm_accessibility,
+        desc: t.perm_accessibility_desc,
+        granted: data.accessibility,
+        settingsUrl: ACCESS_URL,
+      },
+    ];
+
+    container.innerHTML = rows.map(row => `
+      <div class="perm-row">
+        <div class="perm-row-left">
+          <span>${row.label}</span>
+          <span class="perm-row-desc">${row.desc}</span>
+        </div>
+        <div class="perm-row-right">
+          <span class="perm-badge ${row.granted ? 'granted' : 'denied'}">
+            ${row.granted ? t.perm_granted : t.perm_denied}
+          </span>
+          ${!row.granted ? `<a class="perm-open-btn" href="${row.settingsUrl}">${t.perm_open_settings}</a>` : ''}
+        </div>
+      </div>
+    `).join('');
+
+    // 첫 실행 모달: 권한 미부여 + cg_welcomed 미설정 시 표시
+    const anyDenied = !data.screen_recording || !data.accessibility;
+    if (anyDenied && !localStorage.getItem('cg_welcomed')) {
+      document.getElementById('permModal').classList.remove('hidden');
+    }
+  } catch (e) {
+    container.innerHTML = `<span class="perm-loading">${t.perm_loading}</span>`;
+  }
+}
+
+function closePermModal() {
+  localStorage.setItem('cg_welcomed', '1');
+  document.getElementById('permModal').classList.add('hidden');
+}
+
 applyLang();
 loadConfig();
+loadPermissions();
