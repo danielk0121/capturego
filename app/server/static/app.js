@@ -19,10 +19,10 @@ const i18n = {
     hint_save_dir: '절대 경로를 입력하세요. 폴더가 없으면 자동 생성됩니다.',
     section_hotkeys: '단축키',
     label_hotkey_capture: '듀얼 세이브 캡처',
-    placeholder_hotkey_capture: '예: cmd+shift+6',
+    placeholder_hotkey_capture: '입력란 클릭 후 키를 누르세요',
     label_hotkey_scroll: '스크롤 캡처',
-    placeholder_hotkey_scroll: '예: cmd+shift+7',
-    hint_hotkey: '지원 modifier: ctrl, shift, alt, cmd',
+    placeholder_hotkey_scroll: '입력란 클릭 후 키를 누르세요',
+    hint_hotkey: '입력란을 클릭한 뒤 단축키를 누르면 자동 등록됩니다. (Esc: 취소)',
     section_license: '라이선스',
     label_license_key: '라이선스 키',
     hint_license_key: '키 입력 후 저장하면 Nagware 팝업이 영구 해제됩니다.',
@@ -62,10 +62,10 @@ const i18n = {
     hint_save_dir: 'Enter an absolute path. The folder will be created if it does not exist.',
     section_hotkeys: 'Hotkeys',
     label_hotkey_capture: 'Dual Save Capture',
-    placeholder_hotkey_capture: 'e.g. cmd+shift+6',
+    placeholder_hotkey_capture: 'Click and press your shortcut keys',
     label_hotkey_scroll: 'Scroll Capture',
-    placeholder_hotkey_scroll: 'e.g. cmd+shift+7',
-    hint_hotkey: 'Supported modifiers: ctrl, shift, alt, cmd',
+    placeholder_hotkey_scroll: 'Click and press your shortcut keys',
+    hint_hotkey: 'Click the field and press keys to register. (Esc: cancel)',
     section_license: 'License',
     label_license_key: 'License Key',
     hint_license_key: 'Save with a key to permanently dismiss the Nagware popup.',
@@ -260,7 +260,47 @@ async function loadBuildtime() {
   }
 }
 
+// 단축키 input: 키보드 직접 입력으로 단축키 등록
+const MODIFIER_KEYS = new Set(['Control', 'Alt', 'Shift', 'Meta', 'OS']);
+
+function attachHotkeyInput(inputEl) {
+  let prevValue = '';
+
+  inputEl.addEventListener('focus', () => {
+    prevValue = inputEl.value;
+  });
+
+  inputEl.addEventListener('keydown', (e) => {
+    e.preventDefault();
+
+    // Escape: 이전 값 복원
+    if (e.key === 'Escape') {
+      inputEl.value = prevValue;
+      inputEl.blur();
+      return;
+    }
+
+    // 단독 modifier 키는 무시
+    if (MODIFIER_KEYS.has(e.key)) return;
+
+    const parts = [];
+    if (e.ctrlKey)  parts.push('ctrl');
+    if (e.altKey)   parts.push('alt');
+    if (e.shiftKey) parts.push('shift');
+    if (e.metaKey)  parts.push('cmd');
+
+    // 일반 키: 소문자 변환
+    const key = e.key.length === 1 ? e.key.toLowerCase() : e.key.toLowerCase();
+    parts.push(key);
+
+    inputEl.value = parts.join('+');
+  });
+}
+
 applyLang();
 loadConfig();
 loadPermissions();
 loadBuildtime();
+
+attachHotkeyInput(document.getElementById('hotkeyCapture'));
+attachHotkeyInput(document.getElementById('hotkeyScroll'));
