@@ -91,14 +91,24 @@ func noCacheMiddleware() gin.HandlerFunc {
 	}
 }
 
-// serveLicense 오픈소스 라이선스 페이지를 서빙한다
-func serveLicense(c *gin.Context) {
-	c.Data(http.StatusOK, "text/html; charset=utf-8", []byte(licenseHTML()))
-}
-
 // serveIndex 설정 UI HTML을 서빙한다
 func serveIndex(c *gin.Context) {
-	c.Data(http.StatusOK, "text/html; charset=utf-8", []byte(indexHTML()))
+	data, err := staticFiles.ReadFile("static/index.html")
+	if err != nil {
+		c.Status(http.StatusInternalServerError)
+		return
+	}
+	c.Data(http.StatusOK, "text/html; charset=utf-8", data)
+}
+
+// serveLicense 오픈소스 라이선스 페이지를 서빙한다
+func serveLicense(c *gin.Context) {
+	data, err := staticFiles.ReadFile("static/license.html")
+	if err != nil {
+		c.Status(http.StatusInternalServerError)
+		return
+	}
+	c.Data(http.StatusOK, "text/html; charset=utf-8", data)
 }
 
 // getConfig 현재 설정값을 JSON으로 반환한다

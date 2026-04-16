@@ -1,0 +1,65 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>CaptureGo 설정</title>
+  <link rel="icon" type="image/png" href="/static/favicon.png">
+  <link rel="stylesheet" href="/static/style.css">
+</head>
+<body>
+  <div class="container">
+    <div class="top-bar">
+      <h1>⚡ CaptureGo <span data-i18n="title_suffix"></span></h1>
+      <button class="lang-btn" onclick="toggleLang()" id="langBtn">EN</button>
+    </div>
+
+    <div class="card">
+      <h2 data-i18n="section_status"></h2>
+      <div class="stat"><span data-i18n="label_capture_count"></span><span class="stat-val" id="captureCount">-</span></div>
+      <div class="stat"><span data-i18n="label_license"></span><span class="stat-val" id="licenseStatus">-</span></div>
+    </div>
+
+    <div class="card">
+      <h2 data-i18n="section_save_path"></h2>
+      <div class="form-group">
+        <label for="saveDir" data-i18n="label_save_dir"></label>
+        <input type="text" id="saveDir" data-i18n-placeholder="placeholder_save_dir">
+        <p class="hint" data-i18n="hint_save_dir"></p>
+      </div>
+    </div>
+
+    <div class="card">
+      <h2 data-i18n="section_hotkeys"></h2>
+      <div class="form-group">
+        <label for="hotkeyCapture" data-i18n="label_hotkey_capture"></label>
+        <input type="text" id="hotkeyCapture" data-i18n-placeholder="placeholder_hotkey_capture">
+      </div>
+      <div class="form-group">
+        <label for="hotkeyScroll" data-i18n="label_hotkey_scroll"></label>
+        <input type="text" id="hotkeyScroll" data-i18n-placeholder="placeholder_hotkey_scroll">
+        <p class="hint" data-i18n="hint_hotkey"></p>
+      </div>
+    </div>
+
+    <div class="card">
+      <h2 data-i18n="section_license"></h2>
+      <div class="form-group">
+        <label for="licenseKey" data-i18n="label_license_key"></label>
+        <input type="text" id="licenseKey" placeholder="XXXX-XXXX-XXXX-XXXX">
+        <p class="hint" data-i18n="hint_license_key"></p>
+      </div>
+    </div>
+
+    <button class="save-btn" onclick="saveConfig()" data-i18n="btn_save"></button>
+    <p id="status"></p>
+
+    <footer>
+      <div>CaptureGo &mdash; <span data-i18n="footer_dev"></span> <a href="mailto:maedk10@gmail.com">maedk10@gmail.com</a></div>
+      <div><a href="/license" data-i18n="footer_oss_link"></a></div>
+    </footer>
+  </div>
+
+  <script src="/static/app.js"></script>
+</body>
+</html>
