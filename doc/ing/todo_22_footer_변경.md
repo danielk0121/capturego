@@ -39,3 +39,8 @@
 - `app.js`: `loadBuildtime()` 함수로 `/api/buildtime` fetch → `#buildtime` 렌더링 (todo_19에서 완료)
 - `web_server.go`: `/api/buildtime` 엔드포인트 추가 (todo_19에서 완료)
 - `build.sh`: `[1/5]` 단계에서 KST 기준 `v-yyyyMMdd-HHmm-kst` 형식으로 `buildtime.txt` 자동 기록
+
+## 추가 작업
+- [ ] 오픈소스 라이선스 페이지에도 동일하게 footer 적용
+
+## 추가 작업 결과

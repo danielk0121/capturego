@@ -46,3 +46,4 @@ coverage.html
 # 아이콘 생성 스크립트 의존성 및 중간산출물
 build-work/gen_icon/node_modules/
 build-work/gen_icon/out/
+/.playwright-mcp/

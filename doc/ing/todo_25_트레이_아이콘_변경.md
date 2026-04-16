@@ -39,3 +39,8 @@
 - `app/main.go`: `systray.SetTitle("캡쳐고")` → `systray.SetIcon(trayIcon)` 변경, `//go:embed ui/tray_icon.png` 추가
 - `app/ui/tray_icon.png` / `tray_icon@2x.png`: 흑백 모노 아이콘으로 재생성 (22px / 44px)
 - `go build ./...` 통과 확인
+
+## 추가 작업
+- [ ] 트레이 아이콘이 투명 배경으로 되어 있음. 흰색 배경으로 변경 필요. 잘 안보임
+
+## 추가 작업 결과
