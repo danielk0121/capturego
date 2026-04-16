@@ -9,19 +9,32 @@
 </head>
 <body>
   <div class="container">
-    <div class="top-bar">
-      <h1>CaptureGo <span data-i18n="title_suffix"></span></h1>
-      <div class="lang-btn-group">
-        <button class="theme-btn" id="btnTheme" onclick="toggleTheme()" title="Toggle dark/light mode">🌙</button>
-        <a class="lang-btn license-key-btn" href="/license-key" data-i18n="btn_license_key"></a>
-        <button class="lang-btn" id="btnEN" onclick="setLang('en')">EN</button>
-        <button class="lang-btn" id="btnKO" onclick="setLang('ko')">한국어</button>
-      </div>
-    </div>
+    <div id="top-bar" class="top-bar"></div>
 
     <div class="card">
       <h2 data-i18n="section_permissions"></h2>
-      <div id="permList"><span class="perm-loading" data-i18n="perm_loading"></span></div>
+      <div id="permList">
+        <div class="perm-row">
+          <div class="perm-row-left">
+            <span data-i18n="perm_screen_recording"></span>
+            <span class="perm-row-desc" data-i18n="perm_screen_recording_desc"></span>
+          </div>
+          <div class="perm-row-right" id="permScreen">
+            <span class="perm-badge"></span>
+            <a class="perm-open-btn hidden" href="x-apple.systempreferences:com.apple.preference.security?Privacy_ScreenCapture" data-i18n="perm_open_settings"></a>
+          </div>
+        </div>
+        <div class="perm-row">
+          <div class="perm-row-left">
+            <span data-i18n="perm_accessibility"></span>
+            <span class="perm-row-desc" data-i18n="perm_accessibility_desc"></span>
+          </div>
+          <div class="perm-row-right" id="permAccess">
+            <span class="perm-badge"></span>
+            <a class="perm-open-btn hidden" href="x-apple.systempreferences:com.apple.preference.security?Privacy_Accessibility" data-i18n="perm_open_settings"></a>
+          </div>
+        </div>
+      </div>
     </div>
 
     <div class="card">
@@ -46,20 +59,21 @@
       </div>
     </div>
 
-    <div class="card">
-      <h2 data-i18n="section_status"></h2>
-      <div class="stat"><span data-i18n="label_capture_count"></span><span class="stat-val" id="captureCount">-</span></div>
-      <div class="stat"><span data-i18n="label_license"></span><span class="stat-val" id="licenseStatus">-</span></div>
+    <div class="card license-compact">
+      <div class="stat">
+        <div class="license-info">
+          <span data-i18n="label_license"></span>: 
+          <span class="stat-val" id="licenseStatus">-</span>
+        </div>
+        <a class="license-key-link" href="/license-key" data-i18n="btn_license_key"></a>
+      </div>
     </div>
 
     <button class="save-btn" onclick="saveConfig()" data-i18n="btn_save"></button>
     <button class="reset-btn" onclick="resetConfig()" data-i18n="btn_reset"></button>
     <p id="status"></p>
 
-    <footer>
-      <div>github.com/danielk0121 &mdash; <span id="buildtime">v-dev</span></div>
-      <div><a href="/license">Open Source Licenses</a></div>
-    </footer>
+    <footer id="common-footer"></footer>
   </div>
 
   <!-- 권한 안내 모달 -->
@@ -85,6 +99,7 @@
     </div>
   </div>
 
+  <script src="/static/common.js"></script>
   <script src="/static/app.js"></script>
 </body>
 </html>

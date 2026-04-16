@@ -1,17 +1,18 @@
 <!DOCTYPE html>
-<html lang="ko">
+<html lang="en">
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>CaptureGo — 오픈소스 라이선스</title>
+  <title>CaptureGo — Open Source Licenses</title>
   <link rel="icon" type="image/png" href="/static/favicon.png">
   <link rel="stylesheet" href="/static/style.css">
 </head>
 <body>
   <div class="container-wide">
-    <a class="back" href="/">← 설정으로 돌아가기</a>
-    <h1>오픈소스 라이선스</h1>
-    <p class="intro">CaptureGo는 아래 오픈소스 라이브러리를 사용합니다.</p>
+    <div id="top-bar" class="top-bar"></div>
+
+    <h1 class="page-title"><span data-i18n="page_oss_title"></span></h1>
+    <p class="intro" data-i18n="oss_intro"></p>
 
     <div class="card-license">
       <h2>gin-gonic/gin</h2>
@@ -43,20 +44,23 @@
       <span class="spdx">BSD-3-Clause</span>
     </div>
 
-    <footer>
-      <div>github.com/danielk0121 &mdash; <span id="buildtime">v-dev</span></div>
-      <div><a href="/">← Settings</a></div>
-    </footer>
-    <script>
-      (async function() {
-        try {
-          const res = await fetch('/api/buildtime');
-          const data = await res.json();
-          const el = document.getElementById('buildtime');
-          if (el && data.buildtime) el.textContent = data.buildtime;
-        } catch (e) {}
-      })();
-    </script>
+    <footer id="common-footer"></footer>
   </div>
+
+  <script src="/static/common.js"></script>
+  <script>
+    const i18n = {
+      ko: {
+        page_oss_title: '오픈소스 라이선스',
+        oss_intro: 'CaptureGo는 아래 오픈소스 라이브러리를 사용합니다.',
+      },
+      en: {
+        page_oss_title: 'Open Source Licenses',
+        oss_intro: 'CaptureGo uses the following open source libraries.',
+      }
+    };
+
+    initPage(i18n, { titleKey: 'page_oss_title', backHref: '/', hideTitle: true });
+  </script>
 </body>
 </html>

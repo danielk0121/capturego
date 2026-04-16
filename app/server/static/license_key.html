@@ -9,16 +9,16 @@
 </head>
 <body>
   <div class="container">
-    <div class="top-bar">
-      <h1>CaptureGo <span data-i18n="page_license_key_title"></span></h1>
-      <div class="lang-btn-group">
-        <button class="lang-btn" id="btnEN" onclick="setLang('en')">EN</button>
-        <button class="lang-btn" id="btnKO" onclick="setLang('ko')">한국어</button>
-      </div>
-    </div>
+    <div id="top-bar" class="top-bar"></div>
+
+    <h1 class="page-title"><span data-i18n="page_license_key_title"></span></h1>
 
     <div class="card">
       <h2 data-i18n="section_status"></h2>
+      <div class="stat">
+        <span data-i18n="label_capture_count"></span>
+        <span class="stat-val" id="captureCount">-</span>
+      </div>
       <div class="stat">
         <span data-i18n="label_license"></span>
         <span class="stat-val" id="licenseStatus">-</span>
@@ -37,12 +37,10 @@
     <button class="save-btn" onclick="saveLicenseKey()" data-i18n="btn_save"></button>
     <p id="status"></p>
 
-    <footer>
-      <div>github.com/danielk0121 &mdash; <span id="buildtime">v-dev</span></div>
-      <div><a href="/">← <span data-i18n="btn_back_settings"></span></a></div>
-    </footer>
+    <footer id="common-footer"></footer>
   </div>
 
+  <script src="/static/common.js"></script>
   <script src="/static/license_key.js"></script>
 </body>
 </html>

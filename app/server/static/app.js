@@ -3,7 +3,7 @@ const i18n = {
     title_suffix: '설정',
     section_status: '현황',
     label_capture_count: '누적 캡처 횟수',
-    label_license: '라이선스',
+    label_license: '라이선스 상태',
     section_permissions: 'macOS 권한',
     perm_loading: '권한 확인 중...',
     perm_screen_recording: '화면 기록',
@@ -23,7 +23,7 @@ const i18n = {
     label_hotkey_scroll: '스크롤 캡처',
     placeholder_hotkey_scroll: '입력란 클릭 후 키를 누르세요',
     hint_hotkey: '입력란을 클릭한 뒤 단축키를 누르면 자동 등록됩니다. (Esc: 취소)',
-    section_license: '라이선스',
+    section_license: '라이선스 관리',
     label_license_key: '라이선스 키',
     hint_license_key: '키 입력 후 저장하면 Nagware 팝업이 영구 해제됩니다.',
     btn_save: '저장',
@@ -39,7 +39,7 @@ const i18n = {
     msg_save_error: '저장 중 오류가 발생했습니다.',
     footer_dev: '개발자:',
     footer_oss_link: '오픈소스 라이선스',
-    btn_license_key: '라이선스 키',
+    btn_license_key: '라이선스 키 관리',
     modal_title: '권한 설정이 필요합니다',
     modal_sub: 'CaptureGo가 정상 작동하려면 아래 두 가지 권한이 필요합니다.',
     modal_step1: '<b>화면 기록 권한</b>: 시스템 설정 → 개인 정보 보호 및 보안 → <a href="x-apple.systempreferences:com.apple.preference.security?Privacy_ScreenCapture" onclick="openPref(this)">화면 기록</a> → CaptureGo 허용',
@@ -51,7 +51,7 @@ const i18n = {
     title_suffix: 'Settings',
     section_status: 'Status',
     label_capture_count: 'Total Captures',
-    label_license: 'License',
+    label_license: 'License Status',
     section_permissions: 'macOS Permissions',
     perm_loading: 'Checking permissions...',
     perm_screen_recording: 'Screen Recording',
@@ -97,92 +97,38 @@ const i18n = {
   },
 };
 
-let lang = 'en';
-let darkMode = false;
-
-function applyTheme(dark) {
-  darkMode = dark;
-  document.body.classList.toggle('dark', dark);
-  document.body.classList.toggle('light', !dark);
-  const btn = document.getElementById('btnTheme');
-  if (btn) btn.textContent = dark ? '☀️' : '🌙';
-}
-
-async function toggleTheme() {
-  const next = !darkMode;
-  applyTheme(next);
-  try {
-    await fetch('/api/darkmode', {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ dark_mode: next }),
-    });
-  } catch (e) {}
-}
-
-function applyLang() {
-  const t = i18n[lang];
-  requestAnimationFrame(() => {
-    document.querySelectorAll('[data-i18n]').forEach(el => {
-      const key = el.getAttribute('data-i18n');
-      if (t[key] !== undefined) {
-        if (key.startsWith('modal_step')) {
-          el.innerHTML = t[key];
-        } else {
-          el.textContent = t[key];
-        }
-      }
-    });
-    document.querySelectorAll('[data-i18n-placeholder]').forEach(el => {
-      const key = el.getAttribute('data-i18n-placeholder');
-      if (t[key] !== undefined) el.placeholder = t[key];
-    });
-    document.documentElement.lang = lang;
-    // 언어 버튼 active 상태
-    document.getElementById('btnEN').classList.toggle('active', lang === 'en');
-    document.getElementById('btnKO').classList.toggle('active', lang === 'ko');
-    // 라이선스 상태 텍스트 갱신
-    const licEl = document.getElementById('licenseStatus');
-    if (licEl && licEl.dataset.activated === '1') {
-      licEl.textContent = t.license_activated;
-    } else if (licEl && licEl.dataset.activated === '0') {
-      licEl.textContent = t.license_inactive;
-    }
-  });
-}
-
-function setLang(targetLang) {
-  lang = targetLang;
-  applyLang();
-  fetch('/api/config', {
-    method: 'POST',
-    headers: { 'Content-Type': 'application/json' },
-    body: JSON.stringify({ language: targetLang }),
-  }).catch(() => {});
-  // 캐시된 권한 데이터로 재렌더링 (fetch 없이)
-  if (cachedPermData !== null) {
-    renderPermissions(cachedPermData);
-  }
-}
+// lang, darkMode 변수 및 applyTheme, toggleTheme, applyLang, setLang, loadBuildtime 함수는 common.js의 것을 사용
 
 async function loadConfig() {
   try {
-    const res = await fetch('/api/config');
-    const cfg = await res.json();
+    const cfg = await initPage(i18n, { titleKey: 'title_suffix' });
+    if (!cfg) return;
+
     document.getElementById('saveDir').value = cfg.save_directory || '';
     document.getElementById('hotkeyCapture').value = cfg.hotkey_capture || '';
     document.getElementById('hotkeyScroll').value = cfg.hotkey_scroll || '';
-    document.getElementById('captureCount').textContent = cfg.capture_count ?? '-';
-    applyTheme(!!cfg.dark_mode);
-    lang = cfg.language || 'en';
-    applyLang();
+    
     const licEl = document.getElementById('licenseStatus');
     licEl.dataset.activated = cfg.license_activated ? '1' : '0';
-    licEl.textContent = cfg.license_activated
-      ? i18n[lang].license_activated
-      : i18n[lang].license_inactive;
+    // initPage에서 호출된 applyLang이 처리하겠지만, 텍스트 갱신을 위해 onLangApplied 명시 호출
+    onLangApplied(lang, i18n[lang]);
+    
+    loadPermissions();
   } catch (e) {
     showStatus(i18n[lang].msg_load_fail, false);
+  }
+}
+
+function onLangApplied(currentLang, t) {
+  const licEl = document.getElementById('licenseStatus');
+  if (licEl && licEl.dataset.activated === '1') {
+    licEl.textContent = t.license_activated;
+  } else if (licEl && licEl.dataset.activated === '0') {
+    licEl.textContent = t.license_inactive;
+  }
+  
+  if (cachedPermData !== null) {
+    renderPermissions(cachedPermData);
   }
 }
 
@@ -191,7 +137,6 @@ async function saveConfig() {
     save_directory: document.getElementById('saveDir').value.trim(),
     hotkey_capture: document.getElementById('hotkeyCapture').value.trim(),
     hotkey_scroll:  document.getElementById('hotkeyScroll').value.trim(),
-    license_key:    document.getElementById('licenseKey').value.trim(),
   };
   try {
     const res = await fetch('/api/config', {
@@ -234,53 +179,34 @@ function showStatus(msg, ok) {
 
 // 권한 설정 열기 (앱 내 URL scheme 사용)
 function openPref(el) {
-  // <a> 클릭 시 기본 동작(브라우저 이동)을 막고 /api/open-url로 위임
-  // 단순히 링크를 열도록 처리 — 브라우저가 직접 URL scheme을 처리한다
 }
 
 let cachedPermData = null;
 
 function renderPermissions(data) {
   const t = i18n[lang];
-  const container = document.getElementById('permList');
+  
+  const updateRow = (id, granted) => {
+    const root = document.getElementById(id);
+    if (!root) return;
+    const badge = root.querySelector('.perm-badge');
+    const btn = root.querySelector('.perm-open-btn');
+    
+    badge.textContent = granted ? t.perm_granted : t.perm_denied;
+    badge.className = `perm-badge ${granted ? 'granted' : 'denied'}`;
+    
+    if (granted) {
+      btn.classList.add('hidden');
+    } else {
+      btn.classList.remove('hidden');
+    }
+  };
 
-  const SCREEN_URL = 'x-apple.systempreferences:com.apple.preference.security?Privacy_ScreenCapture';
-  const ACCESS_URL = 'x-apple.systempreferences:com.apple.preference.security?Privacy_Accessibility';
-
-  const rows = [
-    {
-      label: t.perm_screen_recording,
-      desc: t.perm_screen_recording_desc,
-      granted: data.screen_recording,
-      settingsUrl: SCREEN_URL,
-    },
-    {
-      label: t.perm_accessibility,
-      desc: t.perm_accessibility_desc,
-      granted: data.accessibility,
-      settingsUrl: ACCESS_URL,
-    },
-  ];
-
-  container.innerHTML = rows.map(row => `
-    <div class="perm-row">
-      <div class="perm-row-left">
-        <span>${row.label}</span>
-        <span class="perm-row-desc">${row.desc}</span>
-      </div>
-      <div class="perm-row-right">
-        <span class="perm-badge ${row.granted ? 'granted' : 'denied'}">
-          ${row.granted ? t.perm_granted : t.perm_denied}
-        </span>
-        ${!row.granted ? `<a class="perm-open-btn" href="${row.settingsUrl}">${t.perm_open_settings}</a>` : ''}
-      </div>
-    </div>
-  `).join('');
+  updateRow('permScreen', data.screen_recording);
+  updateRow('permAccess', data.accessibility);
 }
 
 async function loadPermissions() {
-  const t = i18n[lang];
-  const container = document.getElementById('permList');
   try {
     const res = await fetch('/api/permissions');
     const data = await res.json();
@@ -293,23 +219,12 @@ async function loadPermissions() {
       document.getElementById('permModal').classList.remove('hidden');
     }
   } catch (e) {
-    container.innerHTML = `<span class="perm-loading">${t.perm_loading}</span>`;
+    console.error('Failed to load permissions:', e);
   }
 }
 
 function closePermModal() {
   document.getElementById('permModal').classList.add('hidden');
-}
-
-async function loadBuildtime() {
-  try {
-    const res = await fetch('/api/buildtime');
-    const data = await res.json();
-    const el = document.getElementById('buildtime');
-    if (el && data.buildtime) el.textContent = data.buildtime;
-  } catch (e) {
-    // v-dev 유지
-  }
 }
 
 // 단축키 input: 키보드 직접 입력으로 단축키 등록
@@ -349,10 +264,7 @@ function attachHotkeyInput(inputEl) {
   });
 }
 
-applyLang();
+// 초기화 시작
 loadConfig();
-loadPermissions();
-loadBuildtime();
-
 attachHotkeyInput(document.getElementById('hotkeyCapture'));
 attachHotkeyInput(document.getElementById('hotkeyScroll'));

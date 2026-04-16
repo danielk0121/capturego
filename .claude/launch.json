@@ -1,0 +1,12 @@
+{
+  "version": "0.0.1",
+  "configurations": [
+    {
+      "name": "CaptureGo",
+      "runtimeExecutable": "go",
+      "runtimeArgs": ["run", "./main.go"],
+      "cwd": "app",
+      "port": 18420
+    }
+  ]
+}

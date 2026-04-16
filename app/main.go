@@ -49,7 +49,7 @@ func onTrayReady() {
 
 	// 트레이 메뉴 구성
 	mSettings := systray.AddMenuItem("설정 (Settings)", "브라우저로 설정 UI 열기")
-	mLicenseKey := systray.AddMenuItem("라이선스 키 등록", "라이선스 키 등록 페이지 열기")
+	mLicenseKey := systray.AddMenuItem("라이선스 키 등록 (License Key)", "라이선스 키 등록 페이지 열기")
 	mAbout := systray.AddMenuItem("이 앱에 대하여 (About)", "GitHub 페이지로 이동")
 	systray.AddSeparator()
 	mQuit := systray.AddMenuItem("종료 (Quit)", "CaptureGo 종료")
