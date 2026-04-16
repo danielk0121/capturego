@@ -48,12 +48,34 @@ echo "[3/3] 빌드 결과 확인..."
 ls -lh "$BUNDLE/Contents/MacOS/$BINARY_NAME"
 file "$BUNDLE/Contents/MacOS/$BINARY_NAME"
 
+# DMG 생성
+VERSION="${VERSION:-1.0.0}"
+DMG_NAME="${APP_NAME}-${VERSION}.dmg"
+DMG_PATH="$OUT_DIR/$DMG_NAME"
+
+echo ""
+echo "[4/4] DMG 생성..."
+
+# 임시 마운트 폴더 구성
+DMG_STAGING="$OUT_DIR/dmg_staging"
+rm -rf "$DMG_STAGING"
+mkdir -p "$DMG_STAGING"
+cp -r "$BUNDLE" "$DMG_STAGING/"
+# Applications 심볼릭 링크 추가 (드래그 인스톨 안내)
+ln -s /Applications "$DMG_STAGING/Applications"
+
+# 읽기/쓰기 임시 DMG 생성 후 압축 변환
+TMP_DMG="$OUT_DIR/tmp_rw.dmg"
+hdiutil create -volname "$APP_NAME" -srcfolder "$DMG_STAGING" \
+  -ov -format UDRW "$TMP_DMG" > /dev/null
+hdiutil convert "$TMP_DMG" -format UDZO -imagekey zlib-level=9 \
+  -o "$DMG_PATH" > /dev/null
+rm -f "$TMP_DMG"
+rm -rf "$DMG_STAGING"
+
+ls -lh "$DMG_PATH"
+
 echo ""
 echo "=== 빌드 완료 ==="
-echo "경로: $BUNDLE"
-echo ""
-echo "실행하려면:"
-echo "  open \"$BUNDLE\""
-echo ""
-echo "또는 /Applications 로 이동:"
-echo "  cp -r \"$BUNDLE\" /Applications/"
+echo "앱 번들: $BUNDLE"
+echo "DMG:     $DMG_PATH"
