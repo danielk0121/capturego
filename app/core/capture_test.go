@@ -39,9 +39,9 @@ func TestResolveSavePath_경로_반환(t *testing.T) {
 }
 
 func TestFilenameFormat(t *testing.T) {
-	// 파일명 포맷 검증: 캡쳐고_YYYYMMDD_HHMMSS.png
-	filename := "캡쳐고_" + time.Now().Format("20060102_150405") + ".png"
-	pattern := regexp.MustCompile(`^캡쳐고_\d{8}_\d{6}\.png$`)
+	// 파일명 포맷 검증: capturego_YYYYMMDD_HHMMSS.png
+	filename := "capturego_" + time.Now().Format("20060102_150405") + ".png"
+	pattern := regexp.MustCompile(`^capturego_\d{8}_\d{6}\.png$`)
 	if !pattern.MatchString(filename) {
 		t.Errorf("파일명 포맷이 올바르지 않습니다: %s", filename)
 	}

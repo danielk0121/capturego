@@ -20,7 +20,7 @@ if [ ! -d "$GEN_ICON_DIR/node_modules" ]; then
   echo "       npm install 실행 중..."
   cd "$GEN_ICON_DIR" && npm install --silent
 fi
-node "$GEN_ICON_DIR/gen_icon.js"
+node "$GEN_ICON_DIR/src/gen_icon.js"
 
 # buildtime.txt 생성 (KST 기준 v-yyyyMMdd-HHmm-kst 형식)
 echo "[1/5] buildtime.txt 생성..."

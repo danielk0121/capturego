@@ -20,8 +20,8 @@ func DualSaveCapture() error {
 		return fmt.Errorf("저장 경로 준비 실패: %w", err)
 	}
 
-	// 파일명 생성: 캡쳐고_YYYYMMDD_HHMMSS.png
-	filename := fmt.Sprintf("캡쳐고_%s.png", time.Now().Format("20060102_150405"))
+	// 파일명 생성: capturego_YYYYMMDD_HHMMSS.png
+	filename := fmt.Sprintf("capturego_%s.png", time.Now().Format("20060102_150405"))
 	filePath := filepath.Join(savePath, filename)
 
 	utils.Info("캡처 시작: %s", filePath)

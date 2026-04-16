@@ -46,7 +46,7 @@ func ScrollCapture() error {
 		return nil
 	}
 
-	outputName := fmt.Sprintf("캡쳐고_스크롤_%s.png", time.Now().Format("20060102_150405"))
+	outputName := fmt.Sprintf("capturego_scroll_%s.png", time.Now().Format("20060102_150405"))
 	outputPath := filepath.Join(savePath, outputName)
 
 	if len(frames) == 1 {
