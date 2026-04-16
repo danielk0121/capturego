@@ -47,14 +47,14 @@ func homeDir() string {
 }
 
 // defaultConfig default-config.json을 파싱해 기본 설정값을 반환한다.
-// save_directory가 비어 있으면 런타임 홈 디렉토리 기반 경로로 채운다.
+// save_directory의 선행 '~'는 런타임 홈 디렉토리로 확장한다.
 func defaultConfig() *Config {
 	cfg := &Config{}
 	if err := json.Unmarshal(defaultConfigJSON, cfg); err != nil {
 		panic(fmt.Sprintf("default-config.json 파싱 실패: %v", err))
 	}
-	if cfg.SaveDirectory == "" {
-		cfg.SaveDirectory = filepath.Join(homeDir(), "screenshot_capturego")
+	if cfg.SaveDirectory != "" && cfg.SaveDirectory[0] == '~' {
+		cfg.SaveDirectory = filepath.Join(homeDir(), cfg.SaveDirectory[1:])
 	}
 	return cfg
 }

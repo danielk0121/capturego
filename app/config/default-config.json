@@ -1,5 +1,5 @@
 {
-  "save_directory": "",
+  "save_directory": "~/screenshot_capturego",
   "hotkey_capture": "cmd+shift+6",
   "hotkey_scroll": "cmd+shift+7",
   "capture_count": 0,
