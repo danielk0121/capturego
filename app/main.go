@@ -42,13 +42,10 @@ func onTrayReady() {
 	systray.SetTooltip("CaptureGo — 듀얼 세이브 캡처")
 
 	// 트레이 메뉴 구성
-	mCapture := systray.AddMenuItem("캡처 시작", "듀얼 세이브 캡처 (단축키와 동일)")
-	mScroll := systray.AddMenuItem("스크롤 캡처 시작", "스크롤 캡처")
+	mSettings := systray.AddMenuItem("설정 (Settings)", "브라우저로 설정 UI 열기")
+	mSupport := systray.AddMenuItem("개발자 응원 (Support)", "후원 페이지로 이동")
 	systray.AddSeparator()
-	mSettings := systray.AddMenuItem("설정 열기", "브라우저로 설정 UI 열기")
-	mSupport := systray.AddMenuItem("☕ 개발자 응원하기", "후원 페이지로 이동")
-	systray.AddSeparator()
-	mQuit := systray.AddMenuItem("앱 종료", "CaptureGo 종료")
+	mQuit := systray.AddMenuItem("종료 (Quit)", "CaptureGo 종료")
 
 	// 웹서버 시작
 	webServer = server.New()
@@ -69,21 +66,6 @@ func onTrayReady() {
 	go func() {
 		for {
 			select {
-			case <-mCapture.ClickedCh:
-				utils.Info("트레이: 캡처 시작 클릭")
-				go func() {
-					if err := core.DualSaveCapture(); err != nil {
-						utils.Error("캡처 실패: %v", err)
-					}
-					core.CheckNagware()
-				}()
-			case <-mScroll.ClickedCh:
-				utils.Info("트레이: 스크롤 캡처 시작 클릭")
-				go func() {
-					if err := core.ScrollCapture(); err != nil {
-						utils.Error("스크롤 캡처 실패: %v", err)
-					}
-				}()
 			case <-mSettings.ClickedCh:
 				utils.Info("트레이: 설정 열기 클릭")
 				openBrowser(fmt.Sprintf("http://localhost%s", webServer.Port()))
