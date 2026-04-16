@@ -1,0 +1,35 @@
+# todo: 트레이 아이콘 변경 (독바 디자인 기반 흑백 버전)
+
+## 작업 목표
+현재 "캡쳐고" 텍스트 아이콘 대신, 독바 아이콘(AppIcon)과 동일한 디자인의 흰색 위주 흑백 아이콘을 트레이에 사용한다.
+
+## 현황
+- 현재 트레이 아이콘: `app/ui/tray_icon.png` (22px), `app/ui/tray_icon@2x.png` (44px) — "캡쳐고" 텍스트 기반
+- 독바 아이콘: `build-work/gen_icon/capturego_icon.svg` (컬러 SVG)
+
+## 변경 방향
+- 독바 SVG를 기반으로 **흰색 위주 흑백 버전** SVG를 신규 생성
+  - 배경: 투명
+  - 아이콘 도형: 흰색(#FFFFFF) + 회색 그림자/테두리 최소화
+  - macOS 메뉴바 다크/라이트 모드 모두 대응 (흰색이면 다크 모드에서 잘 보임)
+- `gen_icon.js` 에 트레이 흑백 아이콘 생성 단계 추가
+
+## 세부 작업
+
+- [ ] `build-work/gen_icon/tray_icon_mono.svg` 신규 생성
+  - 독바 SVG 디자인 기반, 모든 색상을 흰색(#FFFFFF)으로 통일
+  - 배경 투명
+- [ ] `build-work/gen_icon/gen_icon.js`
+  - `tray_icon_mono.svg` → `app/ui/tray_icon.png` (22px) 생성 단계 추가
+  - `tray_icon_mono.svg` → `app/ui/tray_icon@2x.png` (44px) 생성 단계 추가
+- [ ] `app/main.go`
+  - 트레이 아이콘 설정 코드에서 `systray.SetTitle("캡쳐고")` 제거 (아이콘으로 대체)
+  - `systray.SetIcon(iconData)` 로 PNG 바이트를 직접 로드하도록 변경
+  - `app/ui/tray_icon.png` 또는 `@2x` 를 `go:embed` 로 내장
+
+## 아이콘 디자인 참고
+- macOS 메뉴바 아이콘 가이드라인: 템플릿 이미지(흑백) 권장
+- 크기: 22×22px (1x), 44×44px (2x / Retina)
+- 여백: 상하좌우 2px 내외
+
+## 작업 결과

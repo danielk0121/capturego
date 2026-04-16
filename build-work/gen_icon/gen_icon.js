@@ -13,12 +13,13 @@ const fs = require('fs');
 const path = require('path');
 const { execSync } = require('child_process');
 
-const SCRIPT_DIR = __dirname;
-const REPO_ROOT  = path.resolve(SCRIPT_DIR, '..', '..');
-const SVG_PATH   = path.join(SCRIPT_DIR, 'capturego_icon.svg');
+const SCRIPT_DIR  = __dirname;
+const REPO_ROOT   = path.resolve(SCRIPT_DIR, '..', '..');
+const SVG_PATH    = path.join(SCRIPT_DIR, 'capturego_icon.svg');
+const TRAY_SVG    = path.join(SCRIPT_DIR, 'tray_icon_mono.svg');
 const ICONSET_DIR = path.join(SCRIPT_DIR, 'out', 'icon.iconset');
-const UI_DIR     = path.join(REPO_ROOT, 'app', 'ui');
-const STATIC_DIR = path.join(REPO_ROOT, 'app', 'server', 'static');
+const UI_DIR      = path.join(REPO_ROOT, 'app', 'ui');
+const STATIC_DIR  = path.join(REPO_ROOT, 'app', 'server', 'static');
 
 // macOS iconset 규격 (10종)
 const iconsetSpecs = [
@@ -61,16 +62,17 @@ async function main() {
   execSync(`iconutil -c icns "${ICONSET_DIR}" -o "${icnsOut}"`);
   console.log(`  AppIcon.icns → ${icnsOut}`);
 
-  // ── 2. 트레이 아이콘 ─────────────────────────────────────────────────────
-  console.log('==> [2/3] 트레이 아이콘 생성');
-  const trayOut   = path.join(UI_DIR, 'tray_icon.png');
-  const tray2xOut = path.join(UI_DIR, 'tray_icon@2x.png');
+  // ── 2. 트레이 아이콘 (흑백 모노) ─────────────────────────────────────────
+  console.log('==> [2/3] 트레이 아이콘 생성 (흑백 모노)');
+  const traySvgBuf = fs.readFileSync(TRAY_SVG);
+  const trayOut    = path.join(UI_DIR, 'tray_icon.png');
+  const tray2xOut  = path.join(UI_DIR, 'tray_icon@2x.png');
 
-  const tray1xBuf = await renderSvg(svgBuf, 22);
+  const tray1xBuf = await renderSvg(traySvgBuf, 22);
   await sharp(tray1xBuf).toFile(trayOut);
   console.log(`  tray_icon.png (22px) → ${trayOut}`);
 
-  const tray2xBuf = await renderSvg(svgBuf, 44);
+  const tray2xBuf = await renderSvg(traySvgBuf, 44);
   await sharp(tray2xBuf).toFile(tray2xOut);
   console.log(`  tray_icon@2x.png (44px) → ${tray2xOut}`);
 

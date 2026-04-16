@@ -1,15 +1,20 @@
 package main
 
 import (
+	_ "embed"
+	"fmt"
+	"os/exec"
+
 	"capturego/config"
 	"capturego/core"
 	"capturego/server"
 	"capturego/utils"
-	"fmt"
-	"os/exec"
 
 	"github.com/getlantern/systray"
 )
+
+//go:embed ui/tray_icon.png
+var trayIcon []byte
 
 var (
 	webServer *server.WebServer
@@ -38,7 +43,7 @@ func main() {
 func onTrayReady() {
 	utils.Info("CaptureGo 시작")
 
-	systray.SetTitle("캡쳐고")
+	systray.SetIcon(trayIcon)
 	systray.SetTooltip("CaptureGo — 듀얼 세이브 캡처")
 
 	// 트레이 메뉴 구성
