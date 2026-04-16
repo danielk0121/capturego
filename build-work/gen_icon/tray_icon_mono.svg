@@ -1,17 +1,11 @@
 <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 100 100">
-  <!-- 배경: 흰색 둥근 사각형 -->
-  <rect x="4" y="4" width="92" height="92" rx="20" ry="20" fill="white"/>
-
-  <!-- 캡처 영역 코너 프레임 (좌상·우하) -->
-  <!-- 좌상단 코너 -->
-  <polyline points="20,35 20,22 33,22" fill="none" stroke="#1a1a1a" stroke-width="7" stroke-linecap="round" stroke-linejoin="round"/>
-  <!-- 우하단 코너 -->
-  <polyline points="80,65 80,78 67,78" fill="none" stroke="#1a1a1a" stroke-width="7" stroke-linecap="round" stroke-linejoin="round"/>
+  <!-- 배경: 흰색 둥근 사각형 (꽉 채움) -->
+  <rect x="0" y="0" width="100" height="100" rx="18" ry="18" fill="white"/>
 
   <!-- 크로스헤어 조준점 (중앙) -->
-  <circle cx="50" cy="50" r="9" fill="none" stroke="#1a1a1a" stroke-width="4"/>
-  <line x1="50" y1="36" x2="50" y2="44" stroke="#1a1a1a" stroke-width="4" stroke-linecap="round"/>
-  <line x1="50" y1="56" x2="50" y2="64" stroke="#1a1a1a" stroke-width="4" stroke-linecap="round"/>
-  <line x1="36" y1="50" x2="44" y2="50" stroke="#1a1a1a" stroke-width="4" stroke-linecap="round"/>
-  <line x1="56" y1="50" x2="64" y2="50" stroke="#1a1a1a" stroke-width="4" stroke-linecap="round"/>
+  <circle cx="50" cy="50" r="26" fill="none" stroke="#1a1a1a" stroke-width="16"/>
+  <line x1="50" y1="10" x2="50" y2="25" stroke="#1a1a1a" stroke-width="10" stroke-linecap="round"/>
+  <line x1="50" y1="75" x2="50" y2="90" stroke="#1a1a1a" stroke-width="10" stroke-linecap="round"/>
+  <line x1="10" y1="50" x2="25" y2="50" stroke="#1a1a1a" stroke-width="10" stroke-linecap="round"/>
+  <line x1="75" y1="50" x2="90" y2="50" stroke="#1a1a1a" stroke-width="10" stroke-linecap="round"/>
 </svg>
