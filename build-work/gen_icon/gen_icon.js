@@ -16,7 +16,8 @@ const { execSync } = require('child_process');
 const SCRIPT_DIR  = __dirname;
 const REPO_ROOT   = path.resolve(SCRIPT_DIR, '..', '..');
 const SVG_PATH    = path.join(SCRIPT_DIR, 'capturego_icon.svg');
-const TRAY_SVG    = path.join(SCRIPT_DIR, 'tray_icon_mono.svg');
+const TRAY_SVG          = path.join(SCRIPT_DIR, 'tray_icon_mono.svg');
+const TRAY_TEMPLATE_SVG = path.join(SCRIPT_DIR, 'tray_icon_template.svg');
 const ICONSET_DIR = path.join(SCRIPT_DIR, 'out', 'icon.iconset');
 const UI_DIR      = path.join(REPO_ROOT, 'app', 'ui');
 const STATIC_DIR  = path.join(REPO_ROOT, 'app', 'server', 'static');
@@ -62,8 +63,10 @@ async function main() {
   execSync(`iconutil -c icns "${ICONSET_DIR}" -o "${icnsOut}"`);
   console.log(`  AppIcon.icns → ${icnsOut}`);
 
-  // ── 2. 트레이 아이콘 (흑백 모노) ─────────────────────────────────────────
-  console.log('==> [2/3] 트레이 아이콘 생성 (흑백 모노)');
+  // ── 2. 트레이 아이콘 ──────────────────────────────────────────────────────
+  console.log('==> [2/3] 트레이 아이콘 생성');
+
+  // 2-a. 흰색 모노 (흰색 배경 없는 원본, 보관용)
   const traySvgBuf = fs.readFileSync(TRAY_SVG);
   const trayOut    = path.join(UI_DIR, 'tray_icon.png');
   const tray2xOut  = path.join(UI_DIR, 'tray_icon@2x.png');
@@ -75,6 +78,19 @@ async function main() {
   const tray2xBuf = await renderSvg(traySvgBuf, 44);
   await sharp(tray2xBuf).toFile(tray2xOut);
   console.log(`  tray_icon@2x.png (44px) → ${tray2xOut}`);
+
+  // 2-b. 검정색 템플릿 (macOS SetTemplateIcon용 — 다크/라이트 자동 대응)
+  const trayTemplateSvgBuf = fs.readFileSync(TRAY_TEMPLATE_SVG);
+  const trayTemplateOut    = path.join(UI_DIR, 'tray_icon_template.png');
+  const trayTemplate2xOut  = path.join(UI_DIR, 'tray_icon_template@2x.png');
+
+  const trayTemplate1xBuf = await renderSvg(trayTemplateSvgBuf, 22);
+  await sharp(trayTemplate1xBuf).toFile(trayTemplateOut);
+  console.log(`  tray_icon_template.png (22px) → ${trayTemplateOut}`);
+
+  const trayTemplate2xBuf = await renderSvg(trayTemplateSvgBuf, 44);
+  await sharp(trayTemplate2xBuf).toFile(trayTemplate2xOut);
+  console.log(`  tray_icon_template@2x.png (44px) → ${trayTemplate2xOut}`);
 
   // ── 3. 파비콘 ────────────────────────────────────────────────────────────
   console.log('==> [3/3] 파비콘 생성');

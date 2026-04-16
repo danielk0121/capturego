@@ -9,3 +9,8 @@
 - 메뉴 트레이 > 라이센스 키 등록 > 새로운 메뉴 추가 > 라이센스 키 등록 웹앱 페이지로 이동
 
 ## 작업 결과
+
+- `static/license_key.html` + `static/license_key.js`: 라이선스 키 등록 전용 페이지 신규 생성 (`/license-key`)
+- `static/index.html`: 설정 페이지에서 라이선스 카드 섹션 제거, 우상단 버튼 그룹에 "라이선스 키" 링크 버튼 추가
+- `server/web_server.go`: `GET /license-key` 라우트 + `serveLicenseKey()` 핸들러 추가
+- `app/main.go`: 트레이 메뉴 `개발자 응원` → `이 앱에 대하여 (About)`, `라이선스 키 등록` 메뉴 추가 (`/license-key` 페이지 오픈)

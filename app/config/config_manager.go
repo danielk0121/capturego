@@ -24,6 +24,8 @@ type Config struct {
 	NagwareDisabled bool `json:"nagware_disabled"`
 	// 라이선스 키
 	LicenseKey string `json:"license_key"`
+	// 다크모드 여부 (false: 라이트모드, true: 다크모드)
+	DarkMode bool `json:"dark_mode"`
 }
 
 var (

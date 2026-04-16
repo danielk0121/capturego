@@ -77,10 +77,12 @@ func (ws *WebServer) registerRoutes() {
 
 	ws.engine.GET("/", serveIndex)
 	ws.engine.GET("/license", serveLicense)
+	ws.engine.GET("/license-key", serveLicenseKey)
 	ws.engine.GET("/api/config", getConfig)
 	ws.engine.POST("/api/config", ws.postConfig)
 	ws.engine.GET("/api/permissions", getPermissions)
 	ws.engine.GET("/api/buildtime", getBuildtime)
+	ws.engine.POST("/api/darkmode", postDarkmode)
 
 	// 정적 파일 서빙 (favicon 등)
 	sub, err := fs.Sub(staticFiles, "static")
@@ -120,6 +122,16 @@ func serveLicense(c *gin.Context) {
 	c.Data(http.StatusOK, "text/html; charset=utf-8", data)
 }
 
+// serveLicenseKey 라이선스 키 등록 페이지를 서빙한다
+func serveLicenseKey(c *gin.Context) {
+	data, err := staticFiles.ReadFile("static/license_key.html")
+	if err != nil {
+		c.Status(http.StatusInternalServerError)
+		return
+	}
+	c.Data(http.StatusOK, "text/html; charset=utf-8", data)
+}
+
 // getBuildtime 빌드타임 문자열을 JSON으로 반환한다
 func getBuildtime(c *gin.Context) {
 	data, err := staticFiles.ReadFile("static/buildtime.txt")
@@ -128,6 +140,24 @@ func getBuildtime(c *gin.Context) {
 		return
 	}
 	c.JSON(http.StatusOK, gin.H{"buildtime": strings.TrimSpace(string(data))})
+}
+
+// postDarkmode 다크모드 설정을 저장한다
+func postDarkmode(c *gin.Context) {
+	var body struct {
+		DarkMode bool `json:"dark_mode"`
+	}
+	if err := c.ShouldBindJSON(&body); err != nil {
+		c.JSON(http.StatusBadRequest, gin.H{"error": "잘못된 요청 형식입니다"})
+		return
+	}
+	cfg := config.Get()
+	cfg.DarkMode = body.DarkMode
+	if err := config.Update(cfg); err != nil {
+		c.JSON(http.StatusInternalServerError, gin.H{"error": "설정 저장에 실패했습니다"})
+		return
+	}
+	c.JSON(http.StatusOK, gin.H{"status": "ok"})
 }
 
 // getPermissions macOS 권한 상태를 JSON으로 반환한다
@@ -146,6 +176,7 @@ func getConfig(c *gin.Context) {
 		"capture_count":     cfg.CaptureCount,
 		"license_activated": cfg.LicenseActivated,
 		"nagware_disabled":  cfg.NagwareDisabled,
+		"dark_mode":         cfg.DarkMode,
 	})
 }
 

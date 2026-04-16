@@ -1,0 +1,48 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>CaptureGo — License Key</title>
+  <link rel="icon" type="image/png" href="/static/favicon.png">
+  <link rel="stylesheet" href="/static/style.css">
+</head>
+<body>
+  <div class="container">
+    <div class="top-bar">
+      <h1>CaptureGo <span data-i18n="page_license_key_title"></span></h1>
+      <div class="lang-btn-group">
+        <button class="lang-btn" id="btnEN" onclick="setLang('en')">EN</button>
+        <button class="lang-btn" id="btnKO" onclick="setLang('ko')">한국어</button>
+      </div>
+    </div>
+
+    <div class="card">
+      <h2 data-i18n="section_status"></h2>
+      <div class="stat">
+        <span data-i18n="label_license"></span>
+        <span class="stat-val" id="licenseStatus">-</span>
+      </div>
+    </div>
+
+    <div class="card">
+      <h2 data-i18n="section_license"></h2>
+      <div class="form-group">
+        <label for="licenseKey" data-i18n="label_license_key"></label>
+        <input type="text" id="licenseKey" placeholder="XXXX-XXXX-XXXX-XXXX">
+        <p class="hint" data-i18n="hint_license_key"></p>
+      </div>
+    </div>
+
+    <button class="save-btn" onclick="saveLicenseKey()" data-i18n="btn_save"></button>
+    <p id="status"></p>
+
+    <footer>
+      <div>github.com/danielk0121 &mdash; <span id="buildtime">v-dev</span></div>
+      <div><a href="/">← <span data-i18n="btn_back_settings"></span></a></div>
+    </footer>
+  </div>
+
+  <script src="/static/license_key.js"></script>
+</body>
+</html>

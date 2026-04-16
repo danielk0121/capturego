@@ -44,3 +44,9 @@
 - [ ] 트레이 아이콘이 투명 배경으로 되어 있음. 흰색 배경으로 변경 필요. 잘 안보임
 
 ## 추가 작업 결과
+
+- `build-work/gen_icon/tray_icon_template.svg`: 검정색(#000000) 버전 신규 생성 (macOS 템플릿 이미지용)
+- `build-work/gen_icon/gen_icon.js`: 템플릿 아이콘 생성 단계 추가 (`tray_icon_template.png`, `@2x`)
+- `app/ui/tray_icon_template.png` / `tray_icon_template@2x.png`: 검정색 템플릿 아이콘 생성 (22px / 44px)
+- `app/main.go`: `systray.SetIcon` → `systray.SetTemplateIcon(trayIconTemplate, trayIcon)` 변경
+  - macOS가 다크/라이트 모드에 따라 자동으로 색상 반전 처리

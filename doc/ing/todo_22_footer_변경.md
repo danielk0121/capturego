@@ -44,3 +44,5 @@
 - [ ] 오픈소스 라이선스 페이지에도 동일하게 footer 적용
 
 ## 추가 작업 결과
+
+- `license.html`: footer를 `github.com/danielk0121 — v-dev` + `← Settings` 링크 형태로 변경, `/api/buildtime` fetch로 동적 렌더링 적용

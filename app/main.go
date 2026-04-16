@@ -16,6 +16,9 @@ import (
 //go:embed ui/tray_icon.png
 var trayIcon []byte
 
+//go:embed ui/tray_icon_template.png
+var trayIconTemplate []byte
+
 var (
 	webServer *server.WebServer
 	hotkeyMgr *core.HotkeyManager
@@ -43,12 +46,14 @@ func main() {
 func onTrayReady() {
 	utils.Info("CaptureGo 시작")
 
-	systray.SetIcon(trayIcon)
+	// macOS 템플릿 이미지: 다크/라이트 모드 자동 대응 (검정 아이콘 → macOS가 색반전)
+	systray.SetTemplateIcon(trayIconTemplate, trayIcon)
 	systray.SetTooltip("CaptureGo — 듀얼 세이브 캡처")
 
 	// 트레이 메뉴 구성
 	mSettings := systray.AddMenuItem("설정 (Settings)", "브라우저로 설정 UI 열기")
-	mSupport := systray.AddMenuItem("개발자 응원 (Support)", "후원 페이지로 이동")
+	mLicenseKey := systray.AddMenuItem("라이선스 키 등록", "라이선스 키 등록 페이지 열기")
+	mAbout := systray.AddMenuItem("이 앱에 대하여 (About)", "GitHub 페이지로 이동")
 	systray.AddSeparator()
 	mQuit := systray.AddMenuItem("종료 (Quit)", "CaptureGo 종료")
 
@@ -74,8 +79,11 @@ func onTrayReady() {
 			case <-mSettings.ClickedCh:
 				utils.Info("트레이: 설정 열기 클릭")
 				openBrowser(fmt.Sprintf("http://localhost%s", webServer.Port()))
-			case <-mSupport.ClickedCh:
-				utils.Info("트레이: 개발자 응원하기 클릭")
+			case <-mLicenseKey.ClickedCh:
+				utils.Info("트레이: 라이선스 키 등록 클릭")
+				openBrowser(fmt.Sprintf("http://localhost%s/license-key", webServer.Port()))
+			case <-mAbout.ClickedCh:
+				utils.Info("트레이: 이 앱에 대하여 클릭")
 				core.OpenSupportPage()
 			case <-mQuit.ClickedCh:
 				utils.Info("트레이: 앱 종료 클릭")

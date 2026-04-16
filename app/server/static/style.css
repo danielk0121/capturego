@@ -24,6 +24,32 @@
   }
 }
 
+/* 강제 다크모드 */
+body.dark {
+  --bg: #1c1c1e;
+  --surface: #2c2c2e;
+  --text: #f5f5f7;
+  --subtext: #8e8e93;
+  --border: #3a3a3c;
+  --divider: #3a3a3c;
+  --accent: #0a84ff;
+  --accent-hover: #409cff;
+  --shadow: rgba(0,0,0,0.4);
+}
+
+/* 강제 라이트모드 */
+body.light {
+  --bg: #f5f5f7;
+  --surface: #ffffff;
+  --text: #1d1d1f;
+  --subtext: #6e6e73;
+  --border: #d2d2d7;
+  --divider: #f5f5f7;
+  --accent: #007aff;
+  --accent-hover: #0066d6;
+  --shadow: rgba(0,0,0,0.1);
+}
+
 * { box-sizing: border-box; margin: 0; padding: 0; }
 
 body {
@@ -61,6 +87,19 @@ h1 { font-size: 24px; font-weight: 600; }
   cursor: pointer;
 }
 .lang-btn:hover { background: var(--border); }
+
+.theme-btn {
+  background: var(--surface);
+  border: 1px solid var(--border);
+  color: var(--text);
+  border-radius: 8px;
+  padding: 6px 10px;
+  font-size: 14px;
+  cursor: pointer;
+  line-height: 1;
+}
+.theme-btn:hover { background: var(--border); }
+
 .lang-btn.active {
   background: var(--accent);
   border-color: var(--accent);

@@ -35,6 +35,7 @@ const i18n = {
     msg_save_error: '저장 중 오류가 발생했습니다.',
     footer_dev: '개발자:',
     footer_oss_link: '오픈소스 라이선스',
+    btn_license_key: '라이선스 키',
     modal_title: '권한 설정이 필요합니다',
     modal_sub: 'CaptureGo가 정상 작동하려면 아래 두 가지 권한이 필요합니다.',
     modal_step1: '<b>화면 기록 권한</b>: 시스템 설정 → 개인 정보 보호 및 보안 → <a href="x-apple.systempreferences:com.apple.preference.security?Privacy_ScreenCapture" onclick="openPref(this)">화면 기록</a> → CaptureGo 허용',
@@ -78,6 +79,7 @@ const i18n = {
     msg_save_error: 'An error occurred while saving.',
     footer_dev: 'Developer:',
     footer_oss_link: 'Open Source Licenses',
+    btn_license_key: 'License Key',
     modal_title: 'Permissions Required',
     modal_sub: 'CaptureGo needs the following two permissions to work properly.',
     modal_step1: '<b>Screen Recording</b>: System Settings → Privacy & Security → <a href="x-apple.systempreferences:com.apple.preference.security?Privacy_ScreenCapture" onclick="openPref(this)">Screen Recording</a> → Allow CaptureGo',
@@ -88,6 +90,27 @@ const i18n = {
 };
 
 let lang = localStorage.getItem('cg_lang') || 'en';
+let darkMode = false;
+
+function applyTheme(dark) {
+  darkMode = dark;
+  document.body.classList.toggle('dark', dark);
+  document.body.classList.toggle('light', !dark);
+  const btn = document.getElementById('btnTheme');
+  if (btn) btn.textContent = dark ? '☀️' : '🌙';
+}
+
+async function toggleTheme() {
+  const next = !darkMode;
+  applyTheme(next);
+  try {
+    await fetch('/api/darkmode', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ dark_mode: next }),
+    });
+  } catch (e) {}
+}
 
 function applyLang() {
   const t = i18n[lang];
@@ -138,6 +161,7 @@ async function loadConfig() {
     document.getElementById('hotkeyCapture').value = cfg.hotkey_capture || '';
     document.getElementById('hotkeyScroll').value = cfg.hotkey_scroll || '';
     document.getElementById('captureCount').textContent = cfg.capture_count ?? '-';
+    applyTheme(!!cfg.dark_mode);
     const licEl = document.getElementById('licenseStatus');
     licEl.dataset.activated = cfg.license_activated ? '1' : '0';
     licEl.textContent = cfg.license_activated
