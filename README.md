@@ -74,6 +74,11 @@ capturego/
 | 파일/기능 | 역할 |
 |------|------|
 | `app/main.go` | 앱 시작, 트레이·웹서버·단축키 초기화 및 생명주기 관리 |
+| `app/server/web_server.go` | Gin 서버 생성, 라우트 등록, 노캐시 미들웨어 |
+| `app/core/capture.go` | 듀얼 세이브 캡처 실행 및 파일/클립보드 병렬 처리 |
+| `app/core/scroll_capture.go` | 스크롤 캡처 루프 및 이미지 스티칭 호출 |
+| `app/config/config_manager.go` | JSON 설정 파일 읽기/쓰기, 기본값 관리 |
+| `build-work/gen_icon/gen_icon.js` | SVG 마스터에서 ICNS·트레이·파비콘 일괄 생성 |
 | **파일명 규칙** | `capturego_YYYYMMDD_HHMMSS.png` (일반), `capturego_scroll_...` (스크롤) |
 | **기본값 초기화** | 설정 페이지 하단 '기본값으로 초기화' 버튼을 통한 설정 리셋 기능 |
 | **코드 서명** | `build.sh` 내 ad-hoc 서명을 통해 macOS Gatekeeper '손상됨' 오류 방지 |
