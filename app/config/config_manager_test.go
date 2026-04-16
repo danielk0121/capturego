@@ -36,7 +36,7 @@ func TestInit_최초실행시_기본설정_파일_생성(t *testing.T) {
 	}
 
 	cfg := Get()
-	if cfg.HotkeyCapture != "ctrl+shift+1" {
+	if cfg.HotkeyCapture != "cmd+shift+6" {
 		t.Errorf("기본 단축키가 올바르지 않습니다: %s", cfg.HotkeyCapture)
 	}
 	if cfg.CaptureCount != 0 {

@@ -43,9 +43,9 @@ func homeDir() string {
 // defaultConfig 기본 설정값을 반환한다
 func defaultConfig() *Config {
 	return &Config{
-		SaveDirectory:    filepath.Join(homeDir(), "Pictures", "CaptureGo"),
-		HotkeyCapture:   "ctrl+shift+1",
-		HotkeyScroll:    "ctrl+shift+2",
+		SaveDirectory:    filepath.Join(homeDir(), "screenshot_capturego"),
+		HotkeyCapture:   "cmd+shift+6",
+		HotkeyScroll:    "cmd+shift+7",
 		CaptureCount:    0,
 		LicenseActivated: false,
 		NagwareDisabled: false,
