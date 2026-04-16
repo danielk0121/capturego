@@ -6,7 +6,10 @@ import (
 	"capturego/utils"
 	"context"
 	"embed"
+	"fmt"
 	"io/fs"
+	"math/rand/v2"
+	"net"
 	"net/http"
 	"strings"
 
@@ -25,9 +28,10 @@ type HotkeyReloader interface {
 
 // WebServer Gin 기반 로컬 HTTP 서버
 type WebServer struct {
-	engine    *gin.Engine
-	srv       *http.Server
-	hotkeyMgr HotkeyReloader
+	engine       *gin.Engine
+	srv          *http.Server
+	hotkeyMgr    HotkeyReloader
+	assignedPort string
 }
 
 // New 웹서버 인스턴스를 생성한다
@@ -36,19 +40,39 @@ func New(hotkeyMgr HotkeyReloader) *WebServer {
 	r := gin.New()
 	r.Use(gin.Recovery())
 
-	ws := &WebServer{engine: r, hotkeyMgr: hotkeyMgr}
+	ws := &WebServer{
+		engine:       r,
+		hotkeyMgr:    hotkeyMgr,
+		assignedPort: findRandomPort(),
+	}
 	ws.registerRoutes()
 	return ws
+}
+
+// findRandomPort 40000~49999 범위에서 사용 가능한 랜덤 포트를 찾는다
+func findRandomPort() string {
+	minPort := 40000
+	maxPort := 49999
+	for i := 0; i < 100; i++ {
+		port := rand.IntN(maxPort-minPort+1) + minPort
+		addr := fmt.Sprintf(":%d", port)
+		ln, err := net.Listen("tcp", addr)
+		if err == nil {
+			ln.Close()
+			return addr
+		}
+	}
+	return defaultPort // 100회 시도 실패 시 기존 포트로 폴백
 }
 
 // Start 서버를 백그라운드 고루틴에서 시작한다
 func (ws *WebServer) Start() {
 	ws.srv = &http.Server{
-		Addr:    defaultPort,
+		Addr:    ws.assignedPort,
 		Handler: ws.engine,
 	}
 	go func() {
-		utils.Info("웹서버 시작: http://localhost%s", defaultPort)
+		utils.Info("웹서버 시작: http://localhost%s", ws.assignedPort)
 		if err := ws.srv.ListenAndServe(); err != nil && err != http.ErrServerClosed {
 			utils.Error("웹서버 오류: %v", err)
 		}
@@ -68,7 +92,7 @@ func (ws *WebServer) Stop() {
 
 // Port 서버가 바인딩된 포트 문자열을 반환한다
 func (ws *WebServer) Port() string {
-	return defaultPort
+	return ws.assignedPort
 }
 
 func (ws *WebServer) registerRoutes() {
