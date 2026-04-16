@@ -2,6 +2,7 @@ package server
 
 import (
 	"capturego/config"
+	"capturego/core"
 	"capturego/utils"
 	"context"
 	"net/http"
@@ -105,8 +106,12 @@ func postConfig(c *gin.Context) {
 	if body.HotkeyScroll != "" {
 		cfg.HotkeyScroll = body.HotkeyScroll
 	}
+	// 라이선스 키 입력 시 별도 검증 처리
 	if body.LicenseKey != "" {
-		cfg.LicenseKey = body.LicenseKey
+		if err := core.ActivateLicense(body.LicenseKey); err != nil {
+			c.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
+			return
+		}
 	}
 
 	if err := config.Update(cfg); err != nil {

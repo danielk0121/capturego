@@ -1,0 +1,46 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE plist PUBLIC "-//Apple//DTD PLIST 1.0//EN"
+  "http://www.apple.com/DTDs/PropertyList-1.0.dtd">
+<plist version="1.0">
+<dict>
+  <!-- 앱 기본 정보 -->
+  <key>CFBundleName</key>
+  <string>CaptureGo</string>
+  <key>CFBundleDisplayName</key>
+  <string>CaptureGo</string>
+  <key>CFBundleIdentifier</key>
+  <string>com.danielk.capturego</string>
+  <key>CFBundleVersion</key>
+  <string>1.0.0</string>
+  <key>CFBundleShortVersionString</key>
+  <string>1.0.0</string>
+  <key>CFBundlePackageType</key>
+  <string>APPL</string>
+  <key>CFBundleExecutable</key>
+  <string>capturego</string>
+  <key>CFBundleIconFile</key>
+  <string>AppIcon</string>
+
+  <!-- Dock 미표시 (메뉴바 전용) -->
+  <key>LSUIElement</key>
+  <true/>
+
+  <!-- 최소 macOS 버전 -->
+  <key>LSMinimumSystemVersion</key>
+  <string>12.0</string>
+
+  <!-- 지원 아키텍처 -->
+  <key>LSArchitecturePriority</key>
+  <array>
+    <string>arm64</string>
+    <string>x86_64</string>
+  </array>
+
+  <!-- 권한 사용 목적 설명 (macOS Privacy) -->
+  <key>NSScreenCaptureUsageDescription</key>
+  <string>화면 영역을 캡처하여 파일로 저장하고 클립보드에 복사하기 위해 필요합니다.</string>
+
+  <key>NSAppleEventsUsageDescription</key>
+  <string>클립보드 이미지 복사 및 알림 표시를 위해 AppleScript를 사용합니다.</string>
+</dict>
+</plist>

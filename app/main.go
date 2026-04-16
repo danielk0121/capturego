@@ -12,8 +12,8 @@ import (
 )
 
 var (
-	webServer  *server.WebServer
-	hotkeyMgr  *core.HotkeyManager
+	webServer *server.WebServer
+	hotkeyMgr *core.HotkeyManager
 )
 
 func main() {
@@ -54,11 +54,15 @@ func onTrayReady() {
 	webServer = server.New()
 	webServer.Start()
 
+	// macOS 권한 확인 (백그라운드에서 실행)
+	go core.CheckPermissions()
+
 	// 글로벌 단축키 등록
 	hotkeyMgr = core.NewHotkeyManager()
 	cfg := config.Get()
 	if err := hotkeyMgr.Start(cfg.HotkeyCapture, cfg.HotkeyScroll); err != nil {
-		utils.Warn("단축키 등록 실패 (손쉬운 사용 권한을 확인하세요): %v", err)
+		utils.Warn("단축키 등록 실패: %v", err)
+		go core.NotifyAccessibilityRequired()
 	}
 
 	// 메뉴 이벤트 처리 (별도 고루틴)
@@ -71,16 +75,21 @@ func onTrayReady() {
 					if err := core.DualSaveCapture(); err != nil {
 						utils.Error("캡처 실패: %v", err)
 					}
+					core.CheckNagware()
 				}()
 			case <-mScroll.ClickedCh:
 				utils.Info("트레이: 스크롤 캡처 시작 클릭")
-				// TODO: 스크롤 캡처 호출 (todo_06)
+				go func() {
+					if err := core.ScrollCapture(); err != nil {
+						utils.Error("스크롤 캡처 실패: %v", err)
+					}
+				}()
 			case <-mSettings.ClickedCh:
 				utils.Info("트레이: 설정 열기 클릭")
 				openBrowser(fmt.Sprintf("http://localhost%s", webServer.Port()))
 			case <-mSupport.ClickedCh:
 				utils.Info("트레이: 개발자 응원하기 클릭")
-				// TODO: 후원 페이지 URL 오픈 (todo_10)
+				core.OpenSupportPage()
 			case <-mQuit.ClickedCh:
 				utils.Info("트레이: 앱 종료 클릭")
 				systray.Quit()

@@ -6,6 +6,7 @@
 *.dylib
 /bin/
 /dist/
+build-work/dist/
 
 # Go build output
 *.o
