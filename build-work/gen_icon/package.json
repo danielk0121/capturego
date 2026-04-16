@@ -2,9 +2,9 @@
   "name": "gen_icon",
   "version": "1.0.0",
   "description": "CaptureGo 아이콘 생성 스크립트",
-  "main": "gen_icon.js",
+  "main": "src/gen_icon.js",
   "scripts": {
-    "gen": "node gen_icon.js"
+    "gen": "node src/gen_icon.js"
   },
   "type": "commonjs",
   "dependencies": {
