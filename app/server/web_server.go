@@ -5,10 +5,15 @@ import (
 	"capturego/core"
 	"capturego/utils"
 	"context"
+	"embed"
+	"io/fs"
 	"net/http"
 
 	"github.com/gin-gonic/gin"
 )
+
+//go:embed static
+var staticFiles embed.FS
 
 const defaultPort = ":18420"
 
@@ -63,6 +68,13 @@ func (ws *WebServer) registerRoutes() {
 	ws.engine.GET("/", serveIndex)
 	ws.engine.GET("/api/config", getConfig)
 	ws.engine.POST("/api/config", postConfig)
+
+	// 정적 파일 서빙 (favicon 등)
+	sub, err := fs.Sub(staticFiles, "static")
+	if err != nil {
+		panic("static FS 초기화 실패: " + err.Error())
+	}
+	ws.engine.StaticFS("/static", http.FS(sub))
 }
 
 // serveIndex 설정 UI HTML을 서빙한다

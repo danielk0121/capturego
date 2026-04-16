@@ -13,6 +13,15 @@ BUNDLE="$OUT_DIR/$APP_NAME.app"
 
 echo "=== CaptureGo 빌드 시작 ==="
 
+# 아이콘 생성 (SVG → icns, tray_icon, favicon)
+echo "[0/3] 아이콘 생성..."
+GEN_ICON_DIR="$SCRIPT_DIR/gen_icon"
+if [ ! -d "$GEN_ICON_DIR/node_modules" ]; then
+  echo "       npm install 실행 중..."
+  cd "$GEN_ICON_DIR" && npm install --silent
+fi
+node "$GEN_ICON_DIR/gen_icon.js"
+
 # 출력 디렉토리 초기화
 rm -rf "$OUT_DIR"
 mkdir -p "$BUNDLE/Contents/MacOS"
