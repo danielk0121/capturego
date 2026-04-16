@@ -18,19 +18,25 @@ var staticFiles embed.FS
 
 const defaultPort = ":18420"
 
+// HotkeyReloader 단축키 재등록 인터페이스
+type HotkeyReloader interface {
+	Reload(captureKey, scrollKey string) error
+}
+
 // WebServer Gin 기반 로컬 HTTP 서버
 type WebServer struct {
-	engine *gin.Engine
-	srv    *http.Server
+	engine    *gin.Engine
+	srv       *http.Server
+	hotkeyMgr HotkeyReloader
 }
 
 // New 웹서버 인스턴스를 생성한다
-func New() *WebServer {
+func New(hotkeyMgr HotkeyReloader) *WebServer {
 	gin.SetMode(gin.ReleaseMode)
 	r := gin.New()
 	r.Use(gin.Recovery())
 
-	ws := &WebServer{engine: r}
+	ws := &WebServer{engine: r, hotkeyMgr: hotkeyMgr}
 	ws.registerRoutes()
 	return ws
 }
@@ -72,7 +78,7 @@ func (ws *WebServer) registerRoutes() {
 	ws.engine.GET("/", serveIndex)
 	ws.engine.GET("/license", serveLicense)
 	ws.engine.GET("/api/config", getConfig)
-	ws.engine.POST("/api/config", postConfig)
+	ws.engine.POST("/api/config", ws.postConfig)
 	ws.engine.GET("/api/permissions", getPermissions)
 	ws.engine.GET("/api/buildtime", getBuildtime)
 
@@ -144,7 +150,7 @@ func getConfig(c *gin.Context) {
 }
 
 // postConfig 설정값을 저장한다
-func postConfig(c *gin.Context) {
+func (ws *WebServer) postConfig(c *gin.Context) {
 	var body struct {
 		SaveDirectory string `json:"save_directory"`
 		HotkeyCapture string `json:"hotkey_capture"`
@@ -157,14 +163,18 @@ func postConfig(c *gin.Context) {
 	}
 
 	cfg := config.Get()
+	hotkeyChanged := false
+
 	if body.SaveDirectory != "" {
 		cfg.SaveDirectory = body.SaveDirectory
 	}
-	if body.HotkeyCapture != "" {
+	if body.HotkeyCapture != "" && body.HotkeyCapture != cfg.HotkeyCapture {
 		cfg.HotkeyCapture = body.HotkeyCapture
+		hotkeyChanged = true
 	}
-	if body.HotkeyScroll != "" {
+	if body.HotkeyScroll != "" && body.HotkeyScroll != cfg.HotkeyScroll {
 		cfg.HotkeyScroll = body.HotkeyScroll
+		hotkeyChanged = true
 	}
 	// 라이선스 키 입력 시 별도 검증 처리
 	if body.LicenseKey != "" {
@@ -178,6 +188,15 @@ func postConfig(c *gin.Context) {
 		utils.Error("설정 저장 실패: %v", err)
 		c.JSON(http.StatusInternalServerError, gin.H{"error": "설정 저장에 실패했습니다"})
 		return
+	}
+
+	// 단축키가 변경된 경우 즉시 재등록
+	if hotkeyChanged && ws.hotkeyMgr != nil {
+		if err := ws.hotkeyMgr.Reload(cfg.HotkeyCapture, cfg.HotkeyScroll); err != nil {
+			utils.Warn("단축키 재등록 실패: %v", err)
+		} else {
+			utils.Info("단축키 재등록 완료: 캡처=%s, 스크롤=%s", cfg.HotkeyCapture, cfg.HotkeyScroll)
+		}
 	}
 
 	utils.Info("설정 저장 완료")

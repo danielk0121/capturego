@@ -52,13 +52,6 @@ func onTrayReady() {
 	systray.AddSeparator()
 	mQuit := systray.AddMenuItem("종료 (Quit)", "CaptureGo 종료")
 
-	// 웹서버 시작
-	webServer = server.New()
-	webServer.Start()
-
-	// macOS 권한 확인 (백그라운드에서 실행)
-	go core.CheckPermissions()
-
 	// 글로벌 단축키 등록
 	hotkeyMgr = core.NewHotkeyManager()
 	cfg := config.Get()
@@ -66,6 +59,13 @@ func onTrayReady() {
 		utils.Warn("단축키 등록 실패: %v", err)
 		go core.NotifyAccessibilityRequired()
 	}
+
+	// 웹서버 시작 (hotkeyMgr 주입: 설정 변경 시 단축키 즉시 재등록)
+	webServer = server.New(hotkeyMgr)
+	webServer.Start()
+
+	// macOS 권한 확인 (백그라운드에서 실행)
+	go core.CheckPermissions()
 
 	// 메뉴 이벤트 처리 (별도 고루틴)
 	go func() {
