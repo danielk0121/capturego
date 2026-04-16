@@ -41,3 +41,15 @@
 - [ ] e2e 테스트: 초기화 버튼 클릭 → 설정값이 기본값으로 복원되는지 확인
 
 ## 작업 결과
+
+- `app/config/default-config.json`: 기본값 JSON 파일 신규 생성 (`go:embed`로 바이너리 내장)
+  - `save_directory`는 런타임 홈 경로에 의존하므로 빈 문자열로 기재, `defaultConfig()`에서 채움
+- `app/config/config_manager.go`
+  - `defaultConfig()`: 하드코딩 제거 → `default-config.json` embed JSON 파싱으로 변경
+  - `ResetToDefault()` 신규 추가: 기본값으로 초기화 (capture_count, license 관련 필드는 유지)
+- `app/server/web_server.go`: `POST /api/config/reset` 엔드포인트 추가 (`postConfigReset` 핸들러)
+  - 초기화 후 단축키도 즉시 재등록
+- `app/server/static/index.html`: "기본값으로 초기화" 버튼 추가
+- `app/server/static/app.js`: `resetConfig()` 함수 추가, i18n 키 추가 (ko/en)
+- `app/server/static/style.css`: `.reset-btn` 스타일 추가 (테두리형, 호버 시 빨간색)
+- `go build ./...` 통과 확인
