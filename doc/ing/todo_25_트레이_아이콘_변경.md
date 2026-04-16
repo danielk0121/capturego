@@ -33,3 +33,9 @@
 - 여백: 상하좌우 2px 내외
 
 ## 작업 결과
+
+- `build-work/gen_icon/tray_icon_mono.svg`: 흰색 크로스헤어 + 코너 프레임 디자인 신규 생성 (투명 배경)
+- `build-work/gen_icon/gen_icon.js`: TRAY_SVG 상수 추가, 트레이 아이콘 생성 시 `tray_icon_mono.svg` 사용
+- `app/main.go`: `systray.SetTitle("캡쳐고")` → `systray.SetIcon(trayIcon)` 변경, `//go:embed ui/tray_icon.png` 추가
+- `app/ui/tray_icon.png` / `tray_icon@2x.png`: 흑백 모노 아이콘으로 재생성 (22px / 44px)
+- `go build ./...` 통과 확인
