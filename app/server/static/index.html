@@ -1,23 +1,20 @@
 <!DOCTYPE html>
-<html lang="ko">
+<html lang="en">
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>CaptureGo 설정</title>
+  <title>CaptureGo Settings</title>
   <link rel="icon" type="image/png" href="/static/favicon.png">
   <link rel="stylesheet" href="/static/style.css">
 </head>
 <body>
   <div class="container">
     <div class="top-bar">
-      <h1>⚡ CaptureGo <span data-i18n="title_suffix"></span></h1>
-      <button class="lang-btn" onclick="toggleLang()" id="langBtn">EN</button>
-    </div>
-
-    <div class="card">
-      <h2 data-i18n="section_status"></h2>
-      <div class="stat"><span data-i18n="label_capture_count"></span><span class="stat-val" id="captureCount">-</span></div>
-      <div class="stat"><span data-i18n="label_license"></span><span class="stat-val" id="licenseStatus">-</span></div>
+      <h1>CaptureGo <span data-i18n="title_suffix"></span></h1>
+      <div class="lang-btn-group">
+        <button class="lang-btn" id="btnEN" onclick="setLang('en')">EN</button>
+        <button class="lang-btn" id="btnKO" onclick="setLang('ko')">한국어</button>
+      </div>
     </div>
 
     <div class="card">
@@ -48,6 +45,12 @@
     </div>
 
     <div class="card">
+      <h2 data-i18n="section_status"></h2>
+      <div class="stat"><span data-i18n="label_capture_count"></span><span class="stat-val" id="captureCount">-</span></div>
+      <div class="stat"><span data-i18n="label_license"></span><span class="stat-val" id="licenseStatus">-</span></div>
+    </div>
+
+    <div class="card">
       <h2 data-i18n="section_license"></h2>
       <div class="form-group">
         <label for="licenseKey" data-i18n="label_license_key"></label>
@@ -60,8 +63,8 @@
     <p id="status"></p>
 
     <footer>
-      <div>CaptureGo &mdash; <span data-i18n="footer_dev"></span> <a href="mailto:maedk10@gmail.com">maedk10@gmail.com</a></div>
-      <div><a href="/license" data-i18n="footer_oss_link"></a></div>
+      <div>github.com/danielk0121 &mdash; <span id="buildtime">v-dev</span></div>
+      <div><a href="/license">Open Source Licenses</a></div>
     </footer>
   </div>
 

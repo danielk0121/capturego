@@ -46,16 +46,26 @@ body {
 
 h1 { font-size: 24px; font-weight: 600; }
 
+.lang-btn-group {
+  display: flex;
+  gap: 4px;
+}
+
 .lang-btn {
   background: var(--surface);
   border: 1px solid var(--border);
-  color: var(--text);
+  color: var(--subtext);
   border-radius: 8px;
   padding: 6px 12px;
   font-size: 13px;
   cursor: pointer;
 }
 .lang-btn:hover { background: var(--border); }
+.lang-btn.active {
+  background: var(--accent);
+  border-color: var(--accent);
+  color: white;
+}
 
 .back {
   display: inline-block;

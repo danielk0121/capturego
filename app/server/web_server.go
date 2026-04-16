@@ -8,6 +8,7 @@ import (
 	"embed"
 	"io/fs"
 	"net/http"
+	"strings"
 
 	"github.com/gin-gonic/gin"
 )
@@ -73,6 +74,7 @@ func (ws *WebServer) registerRoutes() {
 	ws.engine.GET("/api/config", getConfig)
 	ws.engine.POST("/api/config", postConfig)
 	ws.engine.GET("/api/permissions", getPermissions)
+	ws.engine.GET("/api/buildtime", getBuildtime)
 
 	// 정적 파일 서빙 (favicon 등)
 	sub, err := fs.Sub(staticFiles, "static")
@@ -110,6 +112,16 @@ func serveLicense(c *gin.Context) {
 		return
 	}
 	c.Data(http.StatusOK, "text/html; charset=utf-8", data)
+}
+
+// getBuildtime 빌드타임 문자열을 JSON으로 반환한다
+func getBuildtime(c *gin.Context) {
+	data, err := staticFiles.ReadFile("static/buildtime.txt")
+	if err != nil {
+		c.JSON(http.StatusOK, gin.H{"buildtime": "v-dev"})
+		return
+	}
+	c.JSON(http.StatusOK, gin.H{"buildtime": strings.TrimSpace(string(data))})
 }
 
 // getPermissions macOS 권한 상태를 JSON으로 반환한다

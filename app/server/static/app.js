@@ -87,41 +87,47 @@ const i18n = {
   },
 };
 
-let lang = localStorage.getItem('cg_lang') || 'ko';
+let lang = localStorage.getItem('cg_lang') || 'en';
 
 function applyLang() {
   const t = i18n[lang];
-  document.querySelectorAll('[data-i18n]').forEach(el => {
-    const key = el.getAttribute('data-i18n');
-    if (t[key] !== undefined) {
-      // modal step 등 HTML 마크업 포함 문자열은 innerHTML로 처리
-      if (key.startsWith('modal_step')) {
-        el.innerHTML = t[key];
-      } else {
-        el.textContent = t[key];
+  requestAnimationFrame(() => {
+    document.querySelectorAll('[data-i18n]').forEach(el => {
+      const key = el.getAttribute('data-i18n');
+      if (t[key] !== undefined) {
+        if (key.startsWith('modal_step')) {
+          el.innerHTML = t[key];
+        } else {
+          el.textContent = t[key];
+        }
       }
+    });
+    document.querySelectorAll('[data-i18n-placeholder]').forEach(el => {
+      const key = el.getAttribute('data-i18n-placeholder');
+      if (t[key] !== undefined) el.placeholder = t[key];
+    });
+    document.documentElement.lang = lang;
+    // 언어 버튼 active 상태
+    document.getElementById('btnEN').classList.toggle('active', lang === 'en');
+    document.getElementById('btnKO').classList.toggle('active', lang === 'ko');
+    // 라이선스 상태 텍스트 갱신
+    const licEl = document.getElementById('licenseStatus');
+    if (licEl && licEl.dataset.activated === '1') {
+      licEl.textContent = t.license_activated;
+    } else if (licEl && licEl.dataset.activated === '0') {
+      licEl.textContent = t.license_inactive;
     }
   });
-  document.querySelectorAll('[data-i18n-placeholder]').forEach(el => {
-    const key = el.getAttribute('data-i18n-placeholder');
-    if (t[key] !== undefined) el.placeholder = t[key];
-  });
-  document.getElementById('langBtn').textContent = lang === 'ko' ? 'EN' : '한국어';
-  document.documentElement.lang = lang;
 }
 
-function toggleLang() {
-  lang = lang === 'ko' ? 'en' : 'ko';
+function setLang(targetLang) {
+  lang = targetLang;
   localStorage.setItem('cg_lang', lang);
   applyLang();
-  const licEl = document.getElementById('licenseStatus');
-  if (licEl.dataset.activated === '1') {
-    licEl.textContent = i18n[lang].license_activated;
-  } else if (licEl.dataset.activated === '0') {
-    licEl.textContent = i18n[lang].license_inactive;
+  // 캐시된 권한 데이터로 재렌더링 (fetch 없이)
+  if (cachedPermData !== null) {
+    renderPermissions(cachedPermData);
   }
-  // 권한 패널 재렌더링
-  loadPermissions();
 }
 
 async function loadConfig() {
@@ -179,45 +185,54 @@ function openPref(el) {
   // 단순히 링크를 열도록 처리 — 브라우저가 직접 URL scheme을 처리한다
 }
 
+let cachedPermData = null;
+
+function renderPermissions(data) {
+  const t = i18n[lang];
+  const container = document.getElementById('permList');
+
+  const SCREEN_URL = 'x-apple.systempreferences:com.apple.preference.security?Privacy_ScreenCapture';
+  const ACCESS_URL = 'x-apple.systempreferences:com.apple.preference.security?Privacy_Accessibility';
+
+  const rows = [
+    {
+      label: t.perm_screen_recording,
+      desc: t.perm_screen_recording_desc,
+      granted: data.screen_recording,
+      settingsUrl: SCREEN_URL,
+    },
+    {
+      label: t.perm_accessibility,
+      desc: t.perm_accessibility_desc,
+      granted: data.accessibility,
+      settingsUrl: ACCESS_URL,
+    },
+  ];
+
+  container.innerHTML = rows.map(row => `
+    <div class="perm-row">
+      <div class="perm-row-left">
+        <span>${row.label}</span>
+        <span class="perm-row-desc">${row.desc}</span>
+      </div>
+      <div class="perm-row-right">
+        <span class="perm-badge ${row.granted ? 'granted' : 'denied'}">
+          ${row.granted ? t.perm_granted : t.perm_denied}
+        </span>
+        ${!row.granted ? `<a class="perm-open-btn" href="${row.settingsUrl}">${t.perm_open_settings}</a>` : ''}
+      </div>
+    </div>
+  `).join('');
+}
+
 async function loadPermissions() {
   const t = i18n[lang];
   const container = document.getElementById('permList');
   try {
     const res = await fetch('/api/permissions');
     const data = await res.json();
-
-    const SCREEN_URL = 'x-apple.systempreferences:com.apple.preference.security?Privacy_ScreenCapture';
-    const ACCESS_URL = 'x-apple.systempreferences:com.apple.preference.security?Privacy_Accessibility';
-
-    const rows = [
-      {
-        label: t.perm_screen_recording,
-        desc: t.perm_screen_recording_desc,
-        granted: data.screen_recording,
-        settingsUrl: SCREEN_URL,
-      },
-      {
-        label: t.perm_accessibility,
-        desc: t.perm_accessibility_desc,
-        granted: data.accessibility,
-        settingsUrl: ACCESS_URL,
-      },
-    ];
-
-    container.innerHTML = rows.map(row => `
-      <div class="perm-row">
-        <div class="perm-row-left">
-          <span>${row.label}</span>
-          <span class="perm-row-desc">${row.desc}</span>
-        </div>
-        <div class="perm-row-right">
-          <span class="perm-badge ${row.granted ? 'granted' : 'denied'}">
-            ${row.granted ? t.perm_granted : t.perm_denied}
-          </span>
-          ${!row.granted ? `<a class="perm-open-btn" href="${row.settingsUrl}">${t.perm_open_settings}</a>` : ''}
-        </div>
-      </div>
-    `).join('');
+    cachedPermData = data;
+    renderPermissions(data);
 
     // 첫 실행 모달: 권한 미부여 + cg_welcomed 미설정 시 표시
     const anyDenied = !data.screen_recording || !data.accessibility;
@@ -234,6 +249,18 @@ function closePermModal() {
   document.getElementById('permModal').classList.add('hidden');
 }
 
+async function loadBuildtime() {
+  try {
+    const res = await fetch('/api/buildtime');
+    const data = await res.json();
+    const el = document.getElementById('buildtime');
+    if (el && data.buildtime) el.textContent = data.buildtime;
+  } catch (e) {
+    // v-dev 유지
+  }
+}
+
 applyLang();
 loadConfig();
 loadPermissions();
+loadBuildtime();
