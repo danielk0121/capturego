@@ -80,6 +80,7 @@ func (ws *WebServer) registerRoutes() {
 	ws.engine.GET("/license-key", serveLicenseKey)
 	ws.engine.GET("/api/config", getConfig)
 	ws.engine.POST("/api/config", ws.postConfig)
+	ws.engine.POST("/api/config/reset", ws.postConfigReset)
 	ws.engine.GET("/api/permissions", getPermissions)
 	ws.engine.GET("/api/buildtime", getBuildtime)
 	ws.engine.POST("/api/darkmode", postDarkmode)
@@ -231,5 +232,24 @@ func (ws *WebServer) postConfig(c *gin.Context) {
 	}
 
 	utils.Info("설정 저장 완료")
+	c.JSON(http.StatusOK, gin.H{"status": "ok"})
+}
+
+// postConfigReset 설정을 default-config.json 기본값으로 초기화한다
+func (ws *WebServer) postConfigReset(c *gin.Context) {
+	if err := config.ResetToDefault(); err != nil {
+		utils.Error("설정 초기화 실패: %v", err)
+		c.JSON(http.StatusInternalServerError, gin.H{"error": "설정 초기화에 실패했습니다"})
+		return
+	}
+	cfg := config.Get()
+	if ws.hotkeyMgr != nil {
+		if err := ws.hotkeyMgr.Reload(cfg.HotkeyCapture, cfg.HotkeyScroll); err != nil {
+			utils.Warn("단축키 재등록 실패: %v", err)
+		} else {
+			utils.Info("단축키 재등록 완료: 캡처=%s, 스크롤=%s", cfg.HotkeyCapture, cfg.HotkeyScroll)
+		}
+	}
+	utils.Info("설정 기본값 초기화 완료")
 	c.JSON(http.StatusOK, gin.H{"status": "ok"})
 }

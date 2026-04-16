@@ -1,12 +1,16 @@
 package config
 
 import (
+	_ "embed"
 	"encoding/json"
 	"fmt"
 	"os"
 	"os/user"
 	"path/filepath"
 )
+
+//go:embed default-config.json
+var defaultConfigJSON []byte
 
 // Config 앱 전체 설정 스키마
 type Config struct {
@@ -42,17 +46,31 @@ func homeDir() string {
 	return os.Getenv("HOME")
 }
 
-// defaultConfig 기본 설정값을 반환한다
+// defaultConfig default-config.json을 파싱해 기본 설정값을 반환한다.
+// save_directory가 비어 있으면 런타임 홈 디렉토리 기반 경로로 채운다.
 func defaultConfig() *Config {
-	return &Config{
-		SaveDirectory:    filepath.Join(homeDir(), "screenshot_capturego"),
-		HotkeyCapture:   "cmd+shift+6",
-		HotkeyScroll:    "cmd+shift+7",
-		CaptureCount:    0,
-		LicenseActivated: false,
-		NagwareDisabled: false,
-		LicenseKey:      "",
+	cfg := &Config{}
+	if err := json.Unmarshal(defaultConfigJSON, cfg); err != nil {
+		panic(fmt.Sprintf("default-config.json 파싱 실패: %v", err))
 	}
+	if cfg.SaveDirectory == "" {
+		cfg.SaveDirectory = filepath.Join(homeDir(), "screenshot_capturego")
+	}
+	return cfg
+}
+
+// ResetToDefault 설정을 default-config.json 기본값으로 초기화하고 저장한다.
+// capture_count, license_activated, license_key, nagware_disabled 는 유지한다.
+func ResetToDefault() error {
+	def := defaultConfig()
+	if currentConfig != nil {
+		def.CaptureCount     = currentConfig.CaptureCount
+		def.LicenseActivated = currentConfig.LicenseActivated
+		def.LicenseKey       = currentConfig.LicenseKey
+		def.NagwareDisabled  = currentConfig.NagwareDisabled
+	}
+	currentConfig = def
+	return save(currentConfig)
 }
 
 // configFilePath 설정 파일 경로를 반환한다

@@ -27,6 +27,10 @@ const i18n = {
     label_license_key: '라이선스 키',
     hint_license_key: '키 입력 후 저장하면 Nagware 팝업이 영구 해제됩니다.',
     btn_save: '저장',
+    btn_reset: '기본값으로 초기화',
+    msg_reset_confirm: '모든 설정을 기본값으로 초기화하시겠습니까?',
+    msg_reset_done: '설정이 기본값으로 초기화되었습니다.',
+    msg_reset_fail: '초기화에 실패했습니다.',
     license_activated: '인증됨 ✓',
     license_inactive: '미인증',
     msg_saved: '설정이 저장되었습니다.',
@@ -71,6 +75,10 @@ const i18n = {
     label_license_key: 'License Key',
     hint_license_key: 'Save with a key to permanently dismiss the Nagware popup.',
     btn_save: 'Save',
+    btn_reset: 'Reset to Defaults',
+    msg_reset_confirm: 'Reset all settings to default values?',
+    msg_reset_done: 'Settings have been reset to defaults.',
+    msg_reset_fail: 'Failed to reset settings.',
     license_activated: 'Activated ✓',
     license_inactive: 'Not activated',
     msg_saved: 'Settings saved.',
@@ -193,6 +201,21 @@ async function saveConfig() {
     }
   } catch (e) {
     showStatus(i18n[lang].msg_save_error, false);
+  }
+}
+
+async function resetConfig() {
+  if (!confirm(i18n[lang].msg_reset_confirm)) return;
+  try {
+    const res = await fetch('/api/config/reset', { method: 'POST' });
+    if (res.ok) {
+      showStatus(i18n[lang].msg_reset_done, true);
+      await loadConfig();
+    } else {
+      showStatus(i18n[lang].msg_reset_fail, false);
+    }
+  } catch (e) {
+    showStatus(i18n[lang].msg_reset_fail, false);
   }
 }
 
