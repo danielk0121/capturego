@@ -13,12 +13,13 @@ const fs = require('fs');
 const path = require('path');
 const { execSync } = require('child_process');
 
-const SCRIPT_DIR  = __dirname;
-const REPO_ROOT   = path.resolve(SCRIPT_DIR, '..', '..', '..');
+const SCRIPT_DIR  = __dirname;                            // .../gen_icon/src
+const GEN_ROOT    = path.resolve(SCRIPT_DIR, '..');       // .../gen_icon
+const REPO_ROOT   = path.resolve(GEN_ROOT,   '..', '..'); // 리포지토리 루트
 const SVG_PATH    = path.join(SCRIPT_DIR, 'capturego_icon.svg');
 const TRAY_SVG          = path.join(SCRIPT_DIR, 'tray_icon_mono.svg');
 const TRAY_TEMPLATE_SVG = path.join(SCRIPT_DIR, 'tray_icon_template.svg');
-const ICONSET_DIR = path.join(SCRIPT_DIR, 'out', 'icon.iconset');
+const ICONSET_DIR = path.join(GEN_ROOT, 'out', 'icon.iconset');
 const UI_DIR      = path.join(REPO_ROOT, 'app', 'ui');
 const STATIC_DIR  = path.join(REPO_ROOT, 'app', 'server', 'static');
 
