@@ -4,6 +4,7 @@ import (
 	"encoding/json"
 	"fmt"
 	"os"
+	"os/user"
 	"path/filepath"
 )
 
@@ -30,11 +31,19 @@ var (
 	currentConfig *Config
 )
 
+// homeDir 현재 사용자의 홈 디렉토리를 반환한다.
+// os/user.Current()를 우선 사용하고, 실패 시 HOME 환경변수로 폴백한다.
+func homeDir() string {
+	if u, err := user.Current(); err == nil && u.HomeDir != "" {
+		return u.HomeDir
+	}
+	return os.Getenv("HOME")
+}
+
 // defaultConfig 기본 설정값을 반환한다
 func defaultConfig() *Config {
-	homeDir := os.Getenv("HOME")
 	return &Config{
-		SaveDirectory:    filepath.Join(homeDir, "Pictures", "CaptureGo"),
+		SaveDirectory:    filepath.Join(homeDir(), "Pictures", "CaptureGo"),
 		HotkeyCapture:   "ctrl+shift+1",
 		HotkeyScroll:    "ctrl+shift+2",
 		CaptureCount:    0,
@@ -46,8 +55,7 @@ func defaultConfig() *Config {
 
 // configFilePath 설정 파일 경로를 반환한다
 func configFilePath() string {
-	homeDir := os.Getenv("HOME")
-	return filepath.Join(homeDir, "Library", "Application Support", "CaptureGo", "config.json")
+	return filepath.Join(homeDir(), "Library", "Application Support", "CaptureGo", "config.json")
 }
 
 // Init 설정 파일을 로드하거나 최초 실행 시 기본 설정 파일을 생성한다

@@ -6,6 +6,7 @@ import (
 	"fmt"
 	"os"
 	"os/exec"
+	"os/user"
 	"path/filepath"
 	"sync"
 	"time"
@@ -103,7 +104,7 @@ func resolveSavePath() (string, error) {
 
 	if err := ensureDirectory(savePath); err != nil {
 		// 유효하지 않으면 기본 경로로 폴백
-		defaultPath := filepath.Join(os.Getenv("HOME"), "Pictures", "CaptureGo")
+		defaultPath := defaultSaveDir()
 		utils.Warn("저장 경로 '%s' 사용 불가, 기본 경로로 폴백: %s", savePath, defaultPath)
 
 		if err2 := ensureDirectory(defaultPath); err2 != nil {
@@ -112,6 +113,14 @@ func resolveSavePath() (string, error) {
 		return defaultPath, nil
 	}
 	return savePath, nil
+}
+
+// defaultSaveDir 사용자 홈 기준 기본 저장 경로를 반환한다
+func defaultSaveDir() string {
+	if u, err := user.Current(); err == nil && u.HomeDir != "" {
+		return filepath.Join(u.HomeDir, "Pictures", "CaptureGo")
+	}
+	return filepath.Join(os.Getenv("HOME"), "Pictures", "CaptureGo")
 }
 
 // ensureDirectory 디렉토리가 없으면 생성하고, 쓰기 권한을 확인한다
