@@ -16,9 +16,6 @@ import (
 //go:embed ui/tray_icon.png
 var trayIcon []byte
 
-//go:embed ui/tray_icon_template.png
-var trayIconTemplate []byte
-
 var (
 	webServer *server.WebServer
 	hotkeyMgr *core.HotkeyManager
@@ -46,8 +43,8 @@ func main() {
 func onTrayReady() {
 	utils.Info("CaptureGo 시작")
 
-	// macOS 템플릿 이미지: 다크/라이트 모드 자동 대응 (검정 아이콘 → macOS가 색반전)
-	systray.SetTemplateIcon(trayIconTemplate, trayIcon)
+	// 흰색 사각 배경 아이콘: 다크/라이트 모드 모두 동일하게 표시
+	systray.SetIcon(trayIcon)
 	systray.SetTooltip("CaptureGo — 듀얼 세이브 캡처")
 
 	// 트레이 메뉴 구성
