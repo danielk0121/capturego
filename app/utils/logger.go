@@ -74,7 +74,8 @@ func rotateIfNeeded() {
 		return
 	}
 
-	logDir := filepath.Join(os.Getenv("HOME"), "Library", "Logs", "CaptureGo")
+	home := os.Getenv("HOME")
+	logDir := filepath.Join(home, "Library", "Application Support", "CaptureGo", "logs")
 	timestamp := time.Now().Format("20060102_150405")
 	backupPath := filepath.Join(logDir, fmt.Sprintf("capturego_%s.log", timestamp))
 
