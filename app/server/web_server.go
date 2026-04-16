@@ -65,7 +65,11 @@ func (ws *WebServer) Port() string {
 }
 
 func (ws *WebServer) registerRoutes() {
+	// 노캐시 미들웨어 전역 적용
+	ws.engine.Use(noCacheMiddleware())
+
 	ws.engine.GET("/", serveIndex)
+	ws.engine.GET("/license", serveLicense)
 	ws.engine.GET("/api/config", getConfig)
 	ws.engine.POST("/api/config", postConfig)
 
@@ -75,6 +79,21 @@ func (ws *WebServer) registerRoutes() {
 		panic("static FS 초기화 실패: " + err.Error())
 	}
 	ws.engine.StaticFS("/static", http.FS(sub))
+}
+
+// noCacheMiddleware 모든 응답에 캐시 비활성화 헤더를 추가한다
+func noCacheMiddleware() gin.HandlerFunc {
+	return func(c *gin.Context) {
+		c.Header("Cache-Control", "no-cache, no-store, must-revalidate")
+		c.Header("Pragma", "no-cache")
+		c.Header("Expires", "0")
+		c.Next()
+	}
+}
+
+// serveLicense 오픈소스 라이선스 페이지를 서빙한다
+func serveLicense(c *gin.Context) {
+	c.Data(http.StatusOK, "text/html; charset=utf-8", []byte(licenseHTML()))
 }
 
 // serveIndex 설정 UI HTML을 서빙한다
