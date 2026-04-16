@@ -57,6 +57,16 @@ file "$BUNDLE/Contents/MacOS/$BINARY_NAME"
 # 앱 번들 내 buildtime.txt 복사
 cp "$APP_SRC/server/static/buildtime.txt" "$BUNDLE/Contents/buildtime.txt"
 
+# 코드 서명 (ad-hoc): Apple Developer 계정 없이도 Gatekeeper 통과를 위해 필요
+# '-s -' : ad-hoc 서명 (자체 서명, 무료)
+# '--deep' : 번들 내 모든 실행파일 재귀 서명
+# '--force' : 기존 서명 덮어쓰기
+# '--options runtime' : Hardened Runtime 활성화 (Gatekeeper 신뢰성 향상)
+echo "[4.5/5] 코드 서명 (ad-hoc)..."
+codesign --deep --force --options runtime --sign - "$BUNDLE"
+echo "       서명 완료"
+codesign --verify --deep --strict "$BUNDLE" && echo "       서명 검증 OK"
+
 # DMG 생성
 DMG_NAME="${APP_NAME}-${BUILDTIME}.dmg"
 DMG_PATH="$OUT_DIR/$DMG_NAME"
