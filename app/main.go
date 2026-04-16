@@ -2,9 +2,18 @@ package main
 
 import (
 	"capturego/config"
+	"capturego/core"
+	"capturego/server"
 	"capturego/utils"
+	"fmt"
+	"os/exec"
 
 	"github.com/getlantern/systray"
+)
+
+var (
+	webServer  *server.WebServer
+	hotkeyMgr  *core.HotkeyManager
 )
 
 func main() {
@@ -30,10 +39,10 @@ func onTrayReady() {
 	utils.Info("CaptureGo 시작")
 
 	systray.SetTitle("캡쳐고")
-	systray.SetTooltip("CaptureGo")
+	systray.SetTooltip("CaptureGo — 듀얼 세이브 캡처")
 
 	// 트레이 메뉴 구성
-	mCapture := systray.AddMenuItem("캡처 시작", "듀얼 세이브 캡처")
+	mCapture := systray.AddMenuItem("캡처 시작", "듀얼 세이브 캡처 (단축키와 동일)")
 	mScroll := systray.AddMenuItem("스크롤 캡처 시작", "스크롤 캡처")
 	systray.AddSeparator()
 	mSettings := systray.AddMenuItem("설정 열기", "브라우저로 설정 UI 열기")
@@ -41,19 +50,34 @@ func onTrayReady() {
 	systray.AddSeparator()
 	mQuit := systray.AddMenuItem("앱 종료", "CaptureGo 종료")
 
+	// 웹서버 시작
+	webServer = server.New()
+	webServer.Start()
+
+	// 글로벌 단축키 등록
+	hotkeyMgr = core.NewHotkeyManager()
+	cfg := config.Get()
+	if err := hotkeyMgr.Start(cfg.HotkeyCapture, cfg.HotkeyScroll); err != nil {
+		utils.Warn("단축키 등록 실패 (손쉬운 사용 권한을 확인하세요): %v", err)
+	}
+
 	// 메뉴 이벤트 처리 (별도 고루틴)
 	go func() {
 		for {
 			select {
 			case <-mCapture.ClickedCh:
 				utils.Info("트레이: 캡처 시작 클릭")
-				// TODO: 듀얼 세이브 캡처 호출 (todo_05)
+				go func() {
+					if err := core.DualSaveCapture(); err != nil {
+						utils.Error("캡처 실패: %v", err)
+					}
+				}()
 			case <-mScroll.ClickedCh:
 				utils.Info("트레이: 스크롤 캡처 시작 클릭")
 				// TODO: 스크롤 캡처 호출 (todo_06)
 			case <-mSettings.ClickedCh:
 				utils.Info("트레이: 설정 열기 클릭")
-				// TODO: 브라우저로 localhost 열기 (todo_09)
+				openBrowser(fmt.Sprintf("http://localhost%s", webServer.Port()))
 			case <-mSupport.ClickedCh:
 				utils.Info("트레이: 개발자 응원하기 클릭")
 				// TODO: 후원 페이지 URL 오픈 (todo_10)
@@ -67,6 +91,18 @@ func onTrayReady() {
 
 // onTrayExit 트레이 종료 시 정리 작업
 func onTrayExit() {
+	if hotkeyMgr != nil {
+		hotkeyMgr.Stop()
+	}
+	if webServer != nil {
+		webServer.Stop()
+	}
 	utils.Info("CaptureGo 종료")
-	// TODO: 웹서버 종료, 단축키 해제 (todo_08, todo_09)
+}
+
+// openBrowser macOS 기본 브라우저로 URL을 연다
+func openBrowser(url string) {
+	if err := exec.Command("open", url).Start(); err != nil {
+		utils.Error("브라우저 열기 실패: %v", err)
+	}
 }
